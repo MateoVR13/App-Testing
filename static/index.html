@@ -4,34 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YOLOv8 Predicción Móvil</title>
+    <!-- Opcional: Fuente Inter de Google Fonts para un estilo más moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* --- Estilos Generales y Liquid Glass --- */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7f6;
-            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* Fondo degradado azul */
+            color: #e0e0e0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden; /* Evitar scroll horizontal */
         }
+
         .container {
-            width: 100%;
+            width: 95%;
             max-width: 600px;
-            padding: 20px;
+            margin: 20px auto;
+            padding: 25px;
             box-sizing: border-box;
-            background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        h1 {
-            color: #007bff;
+            background: rgba(255, 255, 255, 0.1); /* Blanco semi-transparente */
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px); /* Efecto Liquid Glass */
+            -webkit-backdrop-filter: blur(10px); /* Para compatibilidad con Safari */
+            color: #e0e0e0;
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.8em;
         }
+
+        h1 {
+            color: #a8dadc; /* Azul claro */
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* --- Estilos de Botones --- */
         .controls {
             display: flex;
             flex-wrap: wrap;
@@ -39,197 +54,233 @@
             gap: 15px;
             margin-bottom: 25px;
         }
-        button {
-            padding: 12px 25px;
-            font-size: 1.1em;
+
+        button, .file-upload-button {
+            padding: 12px 20px;
+            font-size: 1em;
             cursor: pointer;
             border: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            color: white;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            color: #fff;
             font-weight: bold;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        #openCameraButton {
-            background-color: #28a745;
-        }
-        #openCameraButton:hover {
-            background-color: #218838;
-        }
-        #takePictureButton {
-            background-color: #007bff;
-            display: none; /* Oculto hasta que la cámara esté abierta */
-        }
-        #takePictureButton:hover {
-            background-color: #0056b3;
-        }
-        #predictButton {
-            background-color: #6f42c1;
-            display: none; /* Oculto hasta que se tome una foto */
-        }
-        #predictButton:hover {
-            background-color: #5a32a3;
-        }
-        #downloadResultButton {
-            background-color: #ffc107;
-            color: #333;
-            display: none; /* Oculto hasta que la predicción esté lista */
-        }
-        #downloadResultButton:hover {
-            background-color: #e0a800;
+            background: rgba(255, 255, 255, 0.2); /* Base para los botones */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex: 1 1 auto; /* Permite que los botones crezcan/reduzcan su tamaño */
+            min-width: 150px; /* Ancho mínimo para los botones */
         }
 
-        #cameraFeed {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none; /* Oculto hasta que la cámara esté abierta */
-            background-color: #000;
+        button:hover, .file-upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
-        #photoCanvas {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-            display: none; /* Oculto hasta que se tome una foto */
-            box-sizing: border-box;
+
+        /* Colores específicos para botones */
+        #openCameraButton { background-color: #4CAF50; } /* Verde */
+        #openCameraButton:hover { background-color: #45a049; }
+        #uploadGalleryButton { background-color: #2196F3; } /* Azul */
+        #uploadGalleryButton:hover { background-color: #1976D2; }
+        #takePictureButton { background-color: #FFC107; color: #333;} /* Ámbar */
+        #takePictureButton:hover { background-color: #FFA000; }
+        #predictButton { background-color: #9C27B0; } /* Púrpura */
+        #predictButton:hover { background-color: #7B1FA2; }
+        #downloadResultButton { background-color: #00BCD4; } /* Cian */
+        #downloadResultButton:hover { background-color: #0097A7; }
+
+        /* Ocultar el input de archivo de la galería */
+        #galleryInput {
+            display: none;
         }
+
+        /* --- Estilos de Video y Canvas --- */
+        video, canvas {
+            width: 100%;
+            max-width: 400px; /* Limitar el ancho para mantener 1:1 */
+            height: auto; /* La altura se ajustará con la relación de aspecto */
+            aspect-ratio: 1 / 1; /* Forzar relación de aspecto 1:1 */
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro para cámara/canvas */
+            display: none; /* Oculto por defecto */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #resultCanvas {
+            max-width: 100%; /* Asegurar que no se desborde */
+            height: auto;
+            object-fit: contain; /* Asegurar que la imagen encaje bien */
+        }
+
+        /* --- Estilos de Resultados --- */
         .results-section {
             margin-top: 30px;
-            border-top: 1px solid #eee;
             padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         .results-section h2 {
-            color: #007bff;
-            font-size: 1.5em;
+            color: #a8dadc;
+            font-size: 1.6em;
             margin-bottom: 15px;
             text-align: center;
         }
-        #predictionImage {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 10px;
-            margin-top: 15px;
-            border: 2px solid #ddd;
-            display: none; /* Oculto hasta que la predicción esté lista */
-        }
         .prediction-details {
-            background-color: #e9f7ef;
-            border: 1px solid #d4edda;
-            border-radius: 8px;
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 15px;
+            padding: 20px;
             margin-top: 20px;
+            text-align: left;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .prediction-details p {
             margin: 8px 0;
             line-height: 1.6;
+            color: #f0f0f0;
         }
         .prediction-details strong {
-            color: #28a745;
+            color: #66BB6A; /* Verde claro para etiquetas */
         }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Animación de Carga --- */
         .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #a8dadc;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 30px auto;
             display: none;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* --- Mensajes de Error --- */
         .error-message {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 15px;
+            color: #FFEBEE; /* Rojo claro */
+            background-color: #C62828; /* Rojo más oscuro */
+            border: 1px solid #FFCDD2;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
             text-align: center;
             display: none;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* Ajustes Responsivos para móviles */
+        /* --- Ajustes Responsivos para móviles --- */
         @media (max-width: 600px) {
             .container {
                 margin: 0;
                 border-radius: 0;
                 box-shadow: none;
                 padding: 15px;
+                width: 100%;
+                min-height: 100vh; /* Ocupar toda la altura en móviles */
             }
             h1 {
-                font-size: 1.5em;
+                font-size: 1.8em;
             }
-            button {
+            button, .file-upload-button {
                 width: 100%;
-                font-size: 1em;
+                font-size: 0.95em;
+                padding: 10px 15px;
             }
             .controls {
                 flex-direction: column;
                 gap: 10px;
+            }
+            video, canvas {
+                width: 100%; /* Ancho completo en pantallas pequeñas */
+                height: auto;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>YOLOv8 Predicción Móvil</h1>
+        <h1>🔍 YOLOv8 Predicción Móvil</h1>
 
         <div class="controls">
-            <button id="openCameraButton">Abrir Cámara Trasera</button>
+            <button id="openCameraButton">Abrir Cámara</button>
+            <input type="file" id="galleryInput" accept="image/*">
+            <button id="uploadGalleryButton" class="file-upload-button">Subir Imagen</button>
             <button id="takePictureButton">Tomar Foto</button>
             <button id="predictButton">Predecir</button>
             <button id="downloadResultButton">Descargar Imagen</button>
         </div>
 
         <video id="cameraFeed" autoplay playsinline></video>
-        <canvas id="photoCanvas"></canvas>
+        <!-- Canvas oculto para capturar la imagen original de la cámara/galería -->
+        <canvas id="captureCanvas" style="display: none;"></canvas>
+        <!-- Canvas visible para mostrar la imagen con las cajas delimitadoras -->
+        <canvas id="resultCanvas"></canvas>
 
         <div class="loader" id="loader"></div>
         <div class="error-message" id="errorMessage"></div>
 
         <div class="results-section">
             <h2>Resultados de la Predicción</h2>
-            <img id="predictionImage" alt="Imagen con Detecciones">
             <div id="predictionDetails" class="prediction-details" style="display: none;">
                 <p><strong>Fecha y Hora:</strong> <span id="timestamp"></span></p>
                 <p><strong>Etiquetas Únicas:</strong> <span id="uniqueLabels"></span></p>
-                <p><strong>Número de Detecciones:</strong> <span id="numDetections"></span></p>
+                <p><strong>Número de Detecciones:</strong> <span id="numDetecciones"></span></p>
                 <p><strong>Detalles Completos (JSON):</strong></p>
-                <pre id="rawPredictionData" style="white-space: pre-wrap; word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;"></pre>
+                <pre id="rawPredictionData"></pre>
             </div>
         </div>
     </div>
 
     <script>
         const openCameraButton = document.getElementById('openCameraButton');
+        const uploadGalleryButton = document.getElementById('uploadGalleryButton');
+        const galleryInput = document.getElementById('galleryInput');
         const takePictureButton = document.getElementById('takePictureButton');
         const predictButton = document.getElementById('predictButton');
         const downloadResultButton = document.getElementById('downloadResultButton');
+
         const cameraFeed = document.getElementById('cameraFeed');
-        const photoCanvas = document.getElementById('photoCanvas');
-        const context = photoCanvas.getContext('2d');
-        const predictionImage = document.getElementById('predictionImage');
+        const captureCanvas = document.getElementById('captureCanvas'); // Canvas oculto para la imagen original
+        const captureContext = captureCanvas.getContext('2d');
+        const resultCanvas = document.getElementById('resultCanvas'); // Canvas visible para el resultado
+        const resultContext = resultCanvas.getContext('2d');
+
         const predictionDetailsDiv = document.getElementById('predictionDetails');
         const timestampSpan = document.getElementById('timestamp');
         const uniqueLabelsSpan = document.getElementById('uniqueLabels');
-        const numDetectionsSpan = document.getElementById('numDetections');
+        const numDeteccionesSpan = document.getElementById('numDetecciones');
         const rawPredictionDataPre = document.getElementById('rawPredictionData');
         const loader = document.getElementById('loader');
         const errorMessageDiv = document.getElementById('errorMessage');
 
         let mediaStream = null;
-        // La URL de la API se obtiene dinámicamente para funcionar tanto en desarrollo como en despliegue
-        const API_URL = window.location.origin;
+        let originalImageBase64 = null; // Almacena la imagen original en base64 para redibujar en el cliente
 
-        // Funciones auxiliares para mostrar/ocultar elementos
+        // TODO: REEMPLAZA ESTA URL CON LA URL DE TU ENDPOINT DE PREDICCIÓN DE HUGGING FACE
+        // Ejemplo: "https://tu-usuario-tu-espacio-de-hf.hf.space/predict"
+        const HF_API_URL = "https://your-user-your-space.hf.space/predict";
+
+        // --- Funciones auxiliares para la UI ---
         function show(element) { element.style.display = 'block'; }
         function hide(element) { element.style.display = 'none'; }
         function displayError(message) {
@@ -241,115 +292,196 @@
             errorMessageDiv.textContent = '';
         }
 
-        // 1. Abrir Cámara Trasera
-        openCameraButton.addEventListener('click', async () => {
-            clearError();
-            hide(predictionDetailsDiv);
-            hide(predictionImage);
+        function resetUIState() {
+            hide(cameraFeed);
+            hide(takePictureButton);
+            hide(predictButton);
             hide(downloadResultButton);
-            hide(photoCanvas);
-            context.clearRect(0, 0, photoCanvas.width, photoCanvas.height); // Limpiar el canvas
-
-            // Detener el stream de la cámara si ya estaba activo
-            if (mediaStream) {
+            hide(resultCanvas);
+            hide(predictionDetailsDiv);
+            show(openCameraButton);
+            show(uploadGalleryButton);
+            clearError();
+            clearCanvas(captureCanvas);
+            clearCanvas(resultCanvas);
+            originalImageBase64 = null; // Limpiar la imagen original
+            if (mediaStream) { // Detener cualquier stream de cámara activo
                 mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
             }
+        }
 
+        function clearCanvas(canvas) {
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = 0; // Resetear dimensiones del canvas
+            canvas.height = 0;
+        }
+
+        // --- Manejo de la Cámara ---
+        openCameraButton.addEventListener('click', async () => {
+            resetUIState();
             try {
-                // Solicitar acceso a la cámara, preferiendo la trasera ("environment")
+                // Solicitar acceso a la cámara trasera con relación de aspecto 1:1
                 mediaStream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: { exact: "environment" }
+                        facingMode: { exact: "environment" },
+                        aspectRatio: { exact: 1 } // Forzar 1:1
                     }
                 });
                 cameraFeed.srcObject = mediaStream;
+                await new Promise(resolve => cameraFeed.onloadedmetadata = resolve); // Esperar a que el video cargue los metadatos
+
+                // Ajustar el canvas de captura a la resolución del video (será 1:1)
+                captureCanvas.width = cameraFeed.videoWidth;
+                captureCanvas.height = cameraFeed.videoHeight;
+
                 show(cameraFeed);
                 show(takePictureButton);
                 hide(openCameraButton);
-                hide(predictButton); // Ocultar predecir hasta que se tome una foto
+                hide(uploadGalleryButton); // Ocultar botón de subir imagen cuando la cámara está activa
             } catch (err) {
                 console.error("Error al acceder a la cámara:", err);
-                displayError("No se pudo acceder a la cámara trasera. Asegúrate de dar permisos y que tu dispositivo tenga una.");
-                show(openCameraButton); // Mostrar el botón de abrir cámara de nuevo si falló
+                if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                    displayError("No se encontró una cámara trasera. Asegúrate de que tu dispositivo tenga una y de dar permisos.");
+                } else if (err.name === "NotAllowedError" || err.name === "SecurityError") {
+                    displayError("Permiso de cámara denegado. Por favor, concede acceso a la cámara en la configuración de tu navegador.");
+                } else {
+                    displayError(`Error inesperado al abrir la cámara: ${err.message}`);
+                }
+                resetUIState(); // Volver al estado inicial
             }
         });
 
-        // 2. Tomar Foto
         takePictureButton.addEventListener('click', () => {
             clearError();
-            if (mediaStream && cameraFeed.srcObject) {
-                // Asegurar que el canvas tenga el mismo tamaño que el video
-                photoCanvas.width = cameraFeed.videoWidth;
-                photoCanvas.height = cameraFeed.videoHeight;
-                // Dibujar el fotograma actual del video en el canvas
-                context.drawImage(cameraFeed, 0, 0, photoCanvas.width, photoCanvas.height);
-                hide(cameraFeed); // Ocultar la transmisión de la cámara
-                show(photoCanvas); // Mostrar la foto tomada en el canvas
-                show(predictButton); // Habilitar el botón de predecir
-                hide(takePictureButton); // Ocultar el botón de tomar foto
+            if (mediaStream && cameraFeed.srcObject && cameraFeed.readyState === 4) { // readyState 4 significa que hay datos suficientes para reproducir
+                captureContext.drawImage(cameraFeed, 0, 0, captureCanvas.width, captureCanvas.height);
+                originalImageBase64 = captureCanvas.toDataURL('image/jpeg', 0.9); // Guardar la imagen original en base64
+
+                // Detener el stream de la cámara
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+                cameraFeed.srcObject = null;
+                hide(cameraFeed);
+
+                // Mostrar la imagen capturada en el canvas de resultado para previsualización
+                const img = new Image();
+                img.onload = () => {
+                    resultCanvas.width = img.width;
+                    resultCanvas.height = img.height;
+                    resultContext.drawImage(img, 0, 0);
+                    show(resultCanvas);
+                };
+                img.src = originalImageBase64;
+
+                show(predictButton);
+                hide(takePictureButton);
+                show(openCameraButton); // Dar opción de abrir cámara de nuevo
+                show(uploadGalleryButton); // Dar opción de subir de galería de nuevo
             } else {
-                displayError("Primero abre la cámara para tomar una foto.");
+                displayError("Primero abre la cámara y asegúrate de que esté lista para tomar una foto.");
             }
         });
 
-        // 3. Predecir
+        // --- Manejo de la Galería ---
+        uploadGalleryButton.addEventListener('click', () => {
+            galleryInput.click(); // Simular clic en el input de tipo file oculto
+        });
+
+        galleryInput.addEventListener('change', (event) => {
+            clearError();
+            resetUIState(); // Resetear UI, pero mantener los botones de acción visibles
+
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                displayError("Por favor, selecciona un archivo de imagen válido.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImageBase64 = e.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    // Ajustar el captureCanvas a las dimensiones de la imagen cargada
+                    captureCanvas.width = img.width;
+                    captureCanvas.height = img.height;
+                    captureContext.drawImage(img, 0, 0, img.width, img.height);
+
+                    // Mostrar la imagen original en el canvas de resultado para previsualización
+                    resultCanvas.width = img.width;
+                    resultCanvas.height = img.height;
+                    resultContext.drawImage(img, 0, 0);
+                    show(resultCanvas);
+
+                    show(predictButton);
+                    hide(takePictureButton); // No hay botón de "tomar foto" para imágenes de galería
+                };
+                img.onerror = () => {
+                    displayError("No se pudo cargar la imagen seleccionada.");
+                    resetUIState();
+                };
+                img.src = originalImageBase64;
+            };
+            reader.onerror = () => {
+                displayError("Error al leer el archivo de imagen.");
+                resetUIState();
+            };
+            reader.readAsDataURL(file); // Leer el archivo como Base64 Data URL
+            event.target.value = null; // Limpiar el input file para permitir subir el mismo archivo de nuevo
+        });
+
+        // --- Envío para Predicción y Dibujo de Cajas ---
         predictButton.addEventListener('click', async () => {
             clearError();
             hide(predictionDetailsDiv);
-            hide(predictionImage);
             hide(downloadResultButton);
 
-            if (photoCanvas.style.display === 'none' || photoCanvas.width === 0) {
-                displayError("Por favor, toma una foto primero.");
+            if (!originalImageBase64) {
+                displayError("Primero toma una foto o sube una imagen.");
                 return;
             }
 
             show(loader);
-            hide(predictButton); // Ocultar el botón de predecir durante la carga
+            hide(predictButton);
 
             try {
-                // Convertir la imagen del canvas a un Blob JPEG
-                const imageDataUrl = photoCanvas.toDataURL('image/jpeg', 0.9);
-                const blob = await (await fetch(imageDataUrl)).blob();
-
-                const formData = new FormData();
-                formData.append('file', blob, 'photo.jpg');
-
-                // Enviar la imagen al endpoint de predicción de FastAPI
-                const response = await fetch(`${API_URL}/predict/upload`, {
+                // Enviar solo la parte Base64 (sin el prefijo "data:image/jpeg;base64,")
+                const base64Data = originalImageBase64.split(',')[1];
+                
+                const response = await fetch(HF_API_URL, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image_base64: base64Data })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({ detail: `Error HTTP ${response.status}` }));
                     throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
                 }
 
                 const data = await response.json();
                 console.log("Prediction Result:", data);
 
-                // 4. Mostrar la imagen con cajas delimitadoras y 5. Guardar todo (mostrar en la UI)
                 if (data.success) {
-                    predictionImage.src = `data:image/jpeg;base64,${data.image_base64}`;
-                    show(predictionImage);
-                    show(predictionDetailsDiv);
-                    show(downloadResultButton);
+                    // Dibujar la imagen original y luego las cajas delimitadoras en el cliente
+                    await drawBoundingBoxes(originalImageBase64, data.detecciones, data.unique_labels);
 
-                    // Llenar los detalles de la predicción
+                    // Mostrar los detalles de la predicción
                     timestampSpan.textContent = new Date(data.timestamp).toLocaleString();
                     uniqueLabelsSpan.textContent = data.unique_labels && data.unique_labels.length > 0 ? data.unique_labels.join(', ') : 'Ninguna detección';
-                    numDetectionsSpan.textContent = data.num_detections;
-                    rawPredictionDataPre.textContent = JSON.stringify(data.detections, null, 2);
-
-                    // Detener el stream de la cámara después de la predicción (opcional)
-                    if (mediaStream) {
-                        mediaStream.getTracks().forEach(track => track.stop());
-                        cameraFeed.srcObject = null;
-                        hide(cameraFeed);
-                        show(openCameraButton);
-                        hide(takePictureButton);
-                    }
+                    numDeteccionesSpan.textContent = data.num_detecciones;
+                    rawPredictionDataPre.textContent = JSON.stringify(data.detecciones, null, 2);
+                    
+                    show(predictionDetailsDiv);
+                    show(downloadResultButton);
                 } else {
                     displayError("La predicción falló: " + (data.detail || "Error desconocido"));
                 }
@@ -359,16 +491,65 @@
                 displayError("Error al realizar la predicción: " + error.message);
             } finally {
                 hide(loader);
-                show(predictButton); // Mostrar el botón de predecir de nuevo, por si se quiere reintentar o tomar otra foto
+                show(predictButton); // Mostrar el botón de predecir de nuevo por si se quiere reintentar
             }
         });
 
-        // Descargar la imagen resultante
+        // --- Función para Dibujar Cajas Delimitadoras en el Canvas del Cliente ---
+        async function drawBoundingBoxes(imgBase64, detections, uniqueLabels) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    resultCanvas.width = img.width;
+                    resultCanvas.height = img.height;
+                    resultContext.drawImage(img, 0, 0); // Dibujar la imagen original
+
+                    resultContext.lineWidth = 2;
+                    resultContext.strokeStyle = '#00FF00'; // Color del borde de la caja
+                    resultContext.fillStyle = '#00FF00'; // Color de fondo del texto
+                    resultContext.font = 'bold 16px Arial';
+
+                    detections.forEach(detection => {
+                        const [x1, y1, x2, y2] = detection.bbox;
+                        const label = detection.class;
+                        const confidence = detection.confidence;
+
+                        // Dibujar caja delimitadora
+                        resultContext.beginPath();
+                        resultContext.rect(x1, y1, x2 - x1, y2 - y1);
+                        resultContext.stroke();
+
+                        // Preparar texto de la etiqueta
+                        const text = `${label} (${(confidence * 100).toFixed(1)}%)`;
+                        const textMetrics = resultContext.measureText(text);
+                        const textWidth = textMetrics.width;
+                        const textHeight = parseInt(resultContext.font, 10); // Aproximación para la altura de la fuente
+
+                        // Dibujar fondo para la etiqueta
+                        resultContext.fillRect(x1, y1 - textHeight - 5, textWidth + 10, textHeight + 5);
+
+                        // Dibujar texto de la etiqueta
+                        resultContext.fillStyle = '#000000'; // Texto negro para mejor contraste
+                        resultContext.fillText(text, x1 + 5, y1 - 5);
+                        resultContext.fillStyle = '#00FF00'; // Restablecer el color de relleno para la siguiente caja
+                    });
+                    show(resultCanvas);
+                    resolve();
+                };
+                img.src = imgBase64;
+                img.onerror = () => {
+                    displayError("Error al cargar la imagen original para dibujar las cajas.");
+                    resolve(); // Resuelve incluso en error para no bloquear la app
+                };
+            });
+        }
+
+        // --- Descargar Imagen con Predicciones ---
         downloadResultButton.addEventListener('click', () => {
-            if (predictionImage.src && predictionImage.src !== window.location.href) {
+            if (resultCanvas.style.display !== 'none' && resultCanvas.width > 0) {
                 const a = document.createElement('a');
-                a.href = predictionImage.src;
-                a.download = `yolo_prediction_${new Date().toISOString()}.jpg`;
+                a.href = resultCanvas.toDataURL('image/jpeg', 0.9); // Obtener imagen del canvas con cajas
+                a.download = `yolo_prediction_${new Date().toISOString().replace(/:/g, '-')}.jpg`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -377,16 +558,8 @@
             }
         });
 
-        // Estado inicial al cargar la página
-        hide(loader);
-        hide(takePictureButton);
-        hide(predictButton);
-        hide(downloadResultButton);
-        hide(cameraFeed);
-        hide(photoCanvas);
-        hide(predictionImage);
-        hide(predictionDetailsDiv);
-        clearError();
+        // --- Inicialización al cargar la página ---
+        window.addEventListener('load', resetUIState);
     </script>
 </body>
 </html>

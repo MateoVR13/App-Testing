@@ -1,6 +1,2 @@
 fastapi
 uvicorn
-ultralytics
-opencv-python-headless  # Recomendado para entornos de servidor sin interfaz gráfica
-numpy
-requests                # Aunque no es directamente usado en el `main.py` final, estaba en tu app.py original.
