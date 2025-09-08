@@ -10,8 +10,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="YOLOv8 Mobile Web App",
-    description="Frontend para la detección de objetos con YOLOv8, utilizando un servicio de predicción externo en Hugging Face.",
+    title="Web App para Detección de Patologías de Pavimento Rígido",
+    description="Frontend para la detección de objetos, utilizando un servicio de predicción.",
     version="1.0.0"
 )
 
