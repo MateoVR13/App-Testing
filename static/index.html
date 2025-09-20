@@ -7,935 +7,613 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Iconos de Material Design -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: rgba(0, 0, 0, 0.2);
-            --button-bg-alpha: 0.2;
-            --button-border-alpha: 0.3;
-            --button-hover-shadow: rgba(0, 0, 0, 0.3);
-            --primary-blue: #007bff; /* Azul vibrante */
-            --primary-blue-dark: #0056b3;
-            --secondary-green: #28a745; /* Verde para historial */
-            --secondary-green-dark: #218838;
-            --secondary-yellow: #ffc107; /* Amarillo para galería */
-            --secondary-yellow-dark: #e0a800;
-            --accent-purple: #6f42c1; /* Púrpura para predecir */
-            --accent-purple-dark: #5a32a3;
-            --text-light: #e0e0e0;
-            --text-dark: #333;
-            --card-dark: #3a3a3a;
-            --card-light: #4c4c4c;
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-shadow: rgba(0, 0, 0, 0.08);
+            --primary-blue: #007aff;
+            --secondary-green: #34c759;
+            --secondary-yellow: #ffcc00;
+            --accent-purple: #af52de;
         }
 
-        /* --- General & Glassmorphism Base --- */
-        body {
-            font-family: 'Inter', sans-serif;
+        /* --- Reseteo y Estilos Base --- */
+        * {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #2a0a57 0%, #4f2c81 100%); /* Degradado púrpura oscuro */
-            color: var(--text-light);
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            animation: backgroundShift 15s ease infinite alternate; /* Animación de fondo */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        @keyframes backgroundShift {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        /* Destellos y brillos */
-        .glass-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .glass-overlay::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
-                        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
-            animation: shine 10s infinite alternate;
-        }
-
-        @keyframes shine {
-            0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-            50% { transform: scale(1.1) rotate(5deg); opacity: 0.7; }
-            100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-        }
-
+        /* --- Contenedor Principal --- */
         .container {
-            width: 95%;
-            max-width: 450px; /* Ajustado para un look más móvil */
-            margin: 20px auto;
-            padding: 25px;
-            box-sizing: border-box;
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 var(--glass-shadow);
-            backdrop-filter: blur(15px) saturate(180%); /* Intensificado el blur */
-            -webkit-backdrop-filter: blur(15px) saturate(180%);
-            text-align: center;
-            position: relative; /* Para el brillo interno */
-            overflow: hidden; /* Para contener el brillo */
-            transition: all 0.3s ease-in-out;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh; /* Ocupa toda la altura en móviles */
+            max-height: 950px;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: transform 0.4s ease-in-out, filter 0.4s ease-in-out;
         }
-
-        /* Brillo interno para el contenedor */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+        .container.history-open {
+            transform: translateX(-50px) scale(0.95);
+            filter: brightness(0.8) blur(4px);
             pointer-events: none;
-            z-index: 1;
         }
 
         .logo {
-            font-family: 'Inter', sans-serif;
             font-size: 2.5em;
             font-weight: 700;
-            color: #fff;
-            margin-bottom: 25px;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            letter-spacing: 1px;
-            background: linear-gradient(45deg, #8a2be2, #007bff, #00BCD4); /* Degradado de color para el logo */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            transition: transform 0.3s ease;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-blue);
         }
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        /* --- Controles Inferiores (Botones de acción principal) --- */
-        .bottom-controls {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 30px;
-            gap: 10px;
-        }
-
-        .bottom-button {
+        
+        main {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, var(--button-bg-alpha));
-            border: 1px solid rgba(255, 255, 255, var(--button-border-alpha));
-            border-radius: 50%; /* Botón redondo */
-            width: 70px; /* Tamaño del botón redondo */
-            height: 70px;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--button-hover-shadow);
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.75em;
-            cursor: pointer;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* --- Estilo Liquid Glass --- */
+        .glass-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .bottom-button::before { /* Efecto de brillo al pasar el ratón */
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        /* --- Cámara y Resultados --- */
+        .camera-preview-container {
             width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: skewX(-20deg);
-            transition: all 0.7s ease;
-        }
-
-        .bottom-button:hover::before {
-            left: 100%;
-        }
-
-        .bottom-button .material-icons {
-            font-size: 32px;
-            margin-bottom: 3px;
-            transition: transform 0.3s ease;
-        }
-        .bottom-button:hover .material-icons {
-            transform: translateY(-2px);
-        }
-        .bottom-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 20px var(--button-hover-shadow);
-        }
-
-        /* Colores específicos para los botones inferiores */
-        #historyButton { background-color: var(--secondary-green); }
-        #historyButton:hover { background-color: var(--secondary-green-dark); }
-        #galleryUploadButton { background-color: var(--secondary-yellow); color: var(--text-dark); }
-        #galleryUploadButton:hover { background-color: var(--secondary-yellow-dark); }
-
-        /* Botón central "Capturar" */
-        #captureButton {
-            background: linear-gradient(45deg, var(--primary-blue), #00BCD4); /* Azul vibrante */
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 50px; /* Forma de píldora */
-            width: 150px; /* Ancho ajustable */
-            height: 60px; /* Altura ajustable */
-            font-size: 1.1em;
-            font-weight: 600;
+            aspect-ratio: 1 / 1;
+            background-color: #e0e0e0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
-            color: #fff;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            flex-grow: 1; /* Permitir que crezca en el flexbox */
-            max-width: 180px; /* Limitar el ancho */
-        }
-        #captureButton .material-icons {
-            font-size: 28px;
-        }
-        #captureButton:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
-        }
-        #captureButton::before { /* Efecto de brillo al pasar el ratón */
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: skewX(-20deg);
-            transition: all 0.7s ease;
-        }
-        #captureButton:hover::before {
-            left: 100%;
-        }
-
-        /* Botón de "Predecir" */
-        #predictButton {
-            background: linear-gradient(45deg, var(--accent-purple), #8a2be2);
-            box-shadow: 0 6px 20px rgba(111, 66, 193, 0.4);
-        }
-        #predictButton:hover {
-            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.6);
-        }
-
-        /* --- Cámara y Controles de Ajuste --- */
-        .camera-preview-container {
-            position: relative;
-            width: 100%;
-            padding-top: 100%; /* Para forzar un aspect ratio de 1:1 */
-            background-color: var(--card-dark);
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid var(--glass-border);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 15px rgba(0,0,0,0.2);
-            display: none; /* Oculto por defecto */
+            padding: 10px;
         }
 
         .camera-preview-container video,
         .camera-preview-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Asegura que el video/imagen cubra el contenedor */
-            border-radius: 15px;
+            object-fit: cover;
+            border-radius: 16px;
         }
-
+        
         .camera-controls-overlay {
             position: absolute;
             bottom: 10px;
-            left: 0;
-            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
             display: flex;
             justify-content: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(0,0,0,0.3); /* Fondo semitransparente para los controles */
-            border-radius: 10px;
-            margin: 0 10px;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
         }
         .camera-control-button {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 8px 12px;
-            color: var(--text-light);
-            font-size: 0.9em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-        .camera-control-button:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .camera-control-button .material-icons {
-            font-size: 20px;
-        }
-
-        /* Resultado de la Predicción */
-        .prediction-results {
+            flex: 1;
+            padding: 8px;
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .camera-control-button:active { transform: scale(0.95); }
+
+        .prediction-results {
+            flex-grow: 1;
             padding: 20px;
-            margin-top: 20px;
-            text-align: left;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px var(--glass-shadow);
-            display: none; /* Oculto por defecto */
-            position: relative;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
         }
-
-        .prediction-results::before { /* Brillo interno */
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 15px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .prediction-results h2 {
-            color: #7ef5ff; /* Azul cian brillante */
-            margin-bottom: 15px;
-            font-size: 1.5em;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
+        
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            align-items: center;
             font-size: 0.95em;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .result-item strong {
-            color: #a8dadc;
-        }
-        .result-item span {
-            color: #f0f0f0;
-        }
+        .result-item:last-child { border-bottom: none; }
+        .result-item strong { color: #555; }
+        .result-item span { color: #000; font-weight: 600; text-align: right; }
 
-        .tag-list {
+        /* --- Controles Inferiores y Animación Bubble --- */
+        .bottom-controls {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-            justify-content: center;
-        }
-        .tag {
-            background-color: rgba(70, 130, 180, 0.5); /* Azul acero semitransparente */
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding-top: 20px;
         }
         
-        .result-image-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
         .action-button {
-            padding: 10px 18px;
-            border-radius: 8px;
             border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+            cursor: pointer;
         }
-        .action-button .material-icons {
-            font-size: 20px;
-        }
+        .action-button .material-icons { font-size: 32px; }
+        .action-button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+        .action-button:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
 
-        #downloadResultButton {
-            background-color: #00BCD4; /* Cian */
-            color: var(--text-dark);
+        #historyButton { background-color: var(--secondary-green); }
+        #galleryUploadButton { background-color: var(--secondary-yellow); color: var(--text-color); }
+        #downloadResultButton { background-color: #00bcd4; }
+
+        #captureButton, #predictButton {
+            width: auto;
+            min-width: 140px;
+            height: 64px;
+            border-radius: 32px;
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 0 20px;
+            gap: 10px;
         }
-        #downloadResultButton:hover {
-            background-color: #0097A7;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
-        }
+        #captureButton { background: var(--primary-blue); }
+        #predictButton { background: var(--accent-purple); }
 
         /* --- Loader y Errores --- */
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #a8dadc;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
-            display: none;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .loader { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .error-message { color: white; background-color: #ff3b30; border-radius: 12px; padding: 15px; text-align: center; font-weight: 600; position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; }
+        .error-message.visible { opacity: 1; transform: translateY(0); }
+        
+        .hidden { display: none !important; }
 
-        .error-message {
-            color: #FFEBEE;
-            background-color: rgba(200, 50, 50, 0.7);
-            border: 1px solid #FFCDD2;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            backdrop-filter: blur(5px);
-        }
-
-        /* --- Historial (IndexedDB) --- */
+        /* --- Panel de Historial --- */
+        #panelOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); z-index: 998; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+        #panelOverlay.visible { opacity: 1; pointer-events: auto; }
+        
         .history-panel {
             position: fixed;
             top: 0;
-            right: -100%; /* Oculto por defecto */
-            width: 85%;
+            right: -100%;
+            width: 90%;
             max-width: 400px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: -8px 0 30px rgba(0,0,0,0.3);
-            z-index: 1000;
+            height: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-left: 1px solid var(--glass-border);
+            z-index: 999;
             display: flex;
             flex-direction: column;
             padding: 20px;
-            transition: right 0.4s ease-in-out;
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .history-panel.open {
-            right: 0;
-        }
-        .history-panel h2 {
-            color: #7ef5ff;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .history-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 10px; /* Espacio para la barra de scroll */
-        }
-        .history-item {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: left;
-            position: relative;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer;
-        }
-        .history-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-        .history-item img {
-            width: 100%;
-            max-height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .history-item p {
-            margin: 5px 0;
-            font-size: 0.9em;
-        }
-        .history-item strong {
-            color: #90CAF9; /* Azul claro */
-        }
-        .history-item .delete-history-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 0, 0, 0.6);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            opacity: 0.8;
-        }
-        .history-item .delete-history-btn:hover {
-            background: rgba(255, 0, 0, 0.8);
-            opacity: 1;
-        }
-
-        .close-history-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            color: #fff;
-            cursor: pointer;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .close-history-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg) scale(1.1);
-        }
+        .history-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0,0,0,0.15); }
         
-        /* Contenedor principal de la app cuando el historial está abierto */
-        .container.history-open {
-            filter: blur(5px) brightness(0.7);
-            transform: translateX(-15%); /* Mover ligeramente el contenido principal */
-            pointer-events: none; /* Deshabilitar interacciones */
-            opacity: 0.7;
-        }
-
-        /* --- Ajustes Responsivos para móviles --- */
-        @media (max-width: 480px) {
-            .container {
-                margin: 0;
-                border-radius: 0;
-                box-shadow: none;
-                padding: 15px;
-                width: 100%;
-                min-height: 100vh;
-            }
-            .logo {
-                font-size: 2em;
-            }
-            .bottom-controls {
-                flex-wrap: wrap; /* Permitir que los botones se envuelvan */
-                justify-content: center;
-                gap: 8px;
-                margin-top: 20px;
-            }
-            .bottom-button, #captureButton {
-                width: 60px;
-                height: 60px;
-                font-size: 0.7em;
-            }
-            #captureButton {
-                width: 120px;
-                height: 50px;
-                font-size: 1em;
-            }
-            .bottom-button .material-icons, #captureButton .material-icons {
-                font-size: 28px;
-            }
-            .history-panel {
-                width: 100%;
-                border-left: none;
-            }
-            .camera-controls-overlay {
-                flex-wrap: wrap;
-                margin: 0 5px;
-            }
-            .camera-control-button {
-                padding: 6px 10px;
-                font-size: 0.8em;
-                gap: 3px;
-            }
-            .camera-control-button .material-icons {
-                font-size: 18px;
-            }
-        }
+        .history-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .history-header h2 { font-size: 1.8em; color: var(--primary-blue); flex-grow: 1; text-align: center; }
+        #closeHistoryButton { background: #e5e5ea; color: #8e8e93; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        .history-list { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+        .history-item { background: rgba(255, 255, 255, 0.8); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .history-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+        .history-item p { margin: 4px 0; font-size: 0.9em; color: #555; }
+        .history-item p strong { color: #111; }
+        .delete-history-btn { position: absolute; top: 10px; right: 10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; opacity: 0.8; transition: all 0.2s ease; }
+        .delete-history-btn:hover { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
 <body>
-    <div class="glass-overlay"></div> <!-- Para los brillos y destellos globales -->
+    <div id="panelOverlay"></div>
 
     <div class="container" id="appContainer">
         <h1 class="logo">Pavimind</h1>
 
-        <div class="camera-preview-container" id="cameraPreviewContainer">
-            <video id="cameraFeed" autoplay playsinline></video>
-            <canvas id="resultCanvas"></canvas> <!-- Para mostrar la imagen capturada y las predicciones -->
-            <div class="camera-controls-overlay">
-                <button class="camera-control-button" id="brightnessDown"><span class="material-icons">brightness_low</span> -</button>
-                <button class="camera-control-button" id="brightnessUp"><span class="material-icons">brightness_high</span> +</button>
-                <button class="camera-control-button" id="contrastDown"><span class="material-icons">tonality</span> -</button>
-                <button class="camera-control-button" id="contrastUp"><span class="material-icons">tonality</span> +</button>
+        <main>
+            <div class="glass-card camera-preview-container">
+                <video id="cameraFeed" autoplay playsinline></video>
+                <canvas id="resultCanvas"></canvas>
+                <div class="camera-controls-overlay hidden">
+                    <button class="camera-control-button" id="brightnessDown">B-</button>
+                    <button class="camera-control-button" id="brightnessUp">B+</button>
+                    <button class="camera-control-button" id="contrastDown">C-</button>
+                    <button class="camera-control-button" id="contrastUp">C+</button>
+                </div>
+                <div class="loader" id="loader"></div>
             </div>
+
+            <div class="glass-card prediction-results">
+                <div class="result-item"><strong>Estado:</strong> <span id="status">Iniciando cámara...</span></div>
+                <div class="result-item"><strong>Detecciones:</strong> <span id="numDetecciones">N/A</span></div>
+                <div class="result-item"><strong>Clases Únicas:</strong> <span id="uniqueLabels">N/A</span></div>
+                <div class="result-item"><strong>Confianza (Prom.):</strong> <span id="avgConfidence">N/A</span></div>
+                <div class="result-item"><strong>Hora Captura:</strong> <span id="timestamp">N/A</span></div>
+                <button id="downloadResultButton" class="action-button hidden" style="align-self: center; margin-top: 10px; width: 56px; height: 56px;"><span class="material-icons">download</span></button>
+            </div>
+        </main>
+        
+        <div class="bottom-controls">
+            <button id="historyButton" class="action-button"><span class="material-icons">history</span></button>
+            <input type="file" id="galleryInput" accept="image/*" class="hidden">
+            
+            <button id="captureButton" class="action-button"><span class="material-icons">camera_alt</span> Capturar</button>
+            <button id="predictButton" class="action-button hidden"><span class="material-icons">data_object</span> Predecir</button>
+            
+            <button id="galleryUploadButton" class="action-button"><span class="material-icons">image</span></button>
         </div>
         
-        <div class="loader" id="loader"></div>
         <div class="error-message" id="errorMessage"></div>
-
-        <div class="prediction-results" id="predictionDetails">
-            <h2>Resultados de la Predicción</h2>
-            <div class="result-item"><strong>Fecha y Hora:</strong> <span id="timestamp"></span></div>
-            <div class="result-item"><strong>Número de Detecciones:</strong> <span id="numDetecciones"></span></div>
-            <div class="result-item"><strong>Etiquetas Únicas:</strong></div>
-            <div class="tag-list" id="uniqueLabelsContainer"></div>
-            <div class="result-item" style="flex-direction: column; align-items: flex-start;">
-                <strong>Detalles por Detección:</strong>
-                <pre id="rawPredictionData" style="width: 100%;"></pre>
-            </div>
-            <div class="result-image-actions">
-                <button id="downloadResultButton" class="action-button"><span class="material-icons">download</span> Descargar</button>
-            </div>
-        </div>
-
-        <div class="bottom-controls">
-            <button id="historyButton" class="bottom-button"><span class="material-icons">history</span> Historial</button>
-            <input type="file" id="galleryInput" accept="image/*" style="display: none;">
-            <button id="galleryUploadButton" class="bottom-button"><span class="material-icons">image</span> Galería</button>
-            <button id="captureButton" class="bottom-button" style="display: none;"><span class="material-icons">camera_alt</span> Capturar</button>
-            <button id="predictButton" class="bottom-button" style="display: none;"><span class="material-icons">data_object</span> Predecir</button>
-        </div>
-
     </div>
 
-    <!-- Panel de Historial (Inicialmente oculto) -->
     <div class="history-panel" id="historyPanel">
-        <button class="close-history-btn" id="closeHistoryButton"><span class="material-icons">close</span></button>
-        <h2><span class="material-icons">history</span> Historial de Predicciones</h2>
+        <div class="history-header">
+            <button id="closeHistoryButton"><span class="material-icons">close</span></button>
+            <h2>Historial</h2>
+        </div>
         <div class="history-list" id="historyList">
-            <!-- Los elementos del historial se cargarán aquí -->
+            <!-- El historial se cargará aquí -->
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Elementos del DOM ---
-            const cameraFeed = document.getElementById('cameraFeed');
-            const resultCanvas = document.getElementById('resultCanvas');
-            const resultContext = resultCanvas.getContext('2d');
-            const cameraControls = document.querySelector('.camera-controls-overlay');
-            const loader = document.getElementById('loader');
-            const errorMessageDiv = document.getElementById('errorMessage');
-
-            // Botones
-            const historyButton = document.getElementById('historyButton');
-            const galleryUploadButton = document.getElementById('galleryUploadButton');
-            const galleryInput = document.getElementById('galleryInput');
-            const captureButton = document.getElementById('captureButton');
-            const predictButton = document.getElementById('predictButton');
-
-            // Controles de cámara
-            const brightnessUpBtn = document.getElementById('brightnessUp');
-            const brightnessDownBtn = document.getElementById('brightnessDown');
-            const contrastUpBtn = document.getElementById('contrastUp');
-            const contrastDownBtn = document.getElementById('contrastDown');
-
-            // Campos de resultados
-            const statusSpan = document.getElementById('status');
-            const numDeteccionesSpan = document.getElementById('numDetecciones');
-            const uniqueLabelsSpan = document.getElementById('uniqueLabels');
-            const avgConfidenceSpan = document.getElementById('avgConfidence');
-            const timestampSpan = document.getElementById('timestamp');
-
-            // --- Estado de la aplicación ---
-            let mediaStream = null;
-            let originalImageBase64 = null;
-            let currentBrightness = 100;
-            let currentContrast = 100;
-            
-            // TODO: REEMPLAZA ESTA URL
+            // --- Constantes y Elementos del DOM ---
             const HF_API_URL = "https://mateovr13-api-web-rigido.hf.space/predict";
+            const dom = {
+                appContainer: document.getElementById('appContainer'),
+                cameraFeed: document.getElementById('cameraFeed'),
+                resultCanvas: document.getElementById('resultCanvas'),
+                cameraControls: document.querySelector('.camera-controls-overlay'),
+                loader: document.getElementById('loader'),
+                errorMessageDiv: document.getElementById('errorMessage'),
+                historyButton: document.getElementById('historyButton'),
+                galleryUploadButton: document.getElementById('galleryUploadButton'),
+                galleryInput: document.getElementById('galleryInput'),
+                captureButton: document.getElementById('captureButton'),
+                predictButton: document.getElementById('predictButton'),
+                downloadResultButton: document.getElementById('downloadResultButton'),
+                statusSpan: document.getElementById('status'),
+                numDeteccionesSpan: document.getElementById('numDetecciones'),
+                uniqueLabelsSpan: document.getElementById('uniqueLabels'),
+                avgConfidenceSpan: document.getElementById('avgConfidence'),
+                timestampSpan: document.getElementById('timestamp'),
+                panelOverlay: document.getElementById('panelOverlay'),
+                historyPanel: document.getElementById('historyPanel'),
+                closeHistoryButton: document.getElementById('closeHistoryButton'),
+                historyList: document.getElementById('historyList'),
+            };
+            const resultContext = dom.resultCanvas.getContext('2d');
 
-            // --- Lógica de IndexedDB para el Historial ---
-            let db;
+            // --- Estado de la Aplicación ---
+            let state = {
+                mediaStream: null,
+                originalImageBase64: null,
+                predictionImageBase64: null,
+                brightness: 100,
+                contrast: 100,
+                db: null,
+            };
+
+            // --- Lógica de la Base de Datos (IndexedDB) ---
             function initDB() {
-                const request = indexedDB.open("PavimindHistoryDB", 1);
-                request.onerror = (event) => console.error("Error al abrir IndexedDB:", event);
-                request.onsuccess = (event) => { db = event.target.result; };
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    db.createObjectStore("predictions", { keyPath: "id", autoIncrement: true });
+                const request = indexedDB.open("PavimindHistoryDB", 2);
+                request.onerror = (e) => console.error("Error DB:", e);
+                request.onsuccess = (e) => { state.db = e.target.result; };
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('predictions')) {
+                        db.createObjectStore("predictions", { keyPath: "id", autoIncrement: true });
+                    }
                 };
             }
-            initDB();
 
-            function savePrediction(predictionData) {
-                if (!db) return;
-                const transaction = db.transaction(["predictions"], "readwrite");
-                const store = transaction.objectStore("predictions");
-                store.add(predictionData);
+            async function savePrediction(data) {
+                if (!state.db) return;
+                return new Promise((resolve, reject) => {
+                    const transaction = state.db.transaction(["predictions"], "readwrite");
+                    const store = transaction.objectStore("predictions");
+                    const request = store.add({...data, predictionImage: state.predictionImageBase64 });
+                    request.onsuccess = resolve;
+                    request.onerror = reject;
+                });
             }
             
-            // Placeholder para mostrar historial
-            historyButton.addEventListener('click', () => {
-                alert("La visualización del historial aún no está implementada en esta interfaz, pero los datos se guardan en segundo plano.");
-            });
+            async function loadHistory() {
+                if (!state.db) return;
+                const transaction = state.db.transaction(["predictions"], "readonly");
+                const store = transaction.objectStore("predictions");
+                const allRecords = store.getAll();
+                allRecords.onsuccess = () => {
+                    dom.historyList.innerHTML = '';
+                    if (allRecords.result.length === 0) {
+                        dom.historyList.innerHTML = '<p style="text-align: center; color: #888;">No hay predicciones guardadas.</p>';
+                        return;
+                    }
+                    allRecords.result.reverse().forEach(rec => {
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        item.innerHTML = `
+                            <img src="${rec.predictionImage}" alt="Resultado de predicción">
+                            <p><strong>Fecha:</strong> ${new Date(rec.timestamp).toLocaleString()}</p>
+                            <p><strong>Detecciones:</strong> ${rec.num_detecciones}</p>
+                            <p><strong>Clases:</strong> ${rec.unique_labels.join(', ') || 'Ninguna'}</p>
+                            <button class="delete-history-btn" data-id="${rec.id}"><span class="material-icons">delete</span></button>
+                        `;
+                        dom.historyList.appendChild(item);
+                    });
+                };
+            }
+            
+            async function deleteHistoryItem(id) {
+                if (!state.db) return;
+                const transaction = state.db.transaction(["predictions"], "readwrite");
+                const store = transaction.objectStore("predictions");
+                store.delete(id);
+                await loadHistory();
+            }
 
-            // --- Funciones de UI ---
-            const show = (el) => el.classList.remove('hidden');
-            const hide = (el) => el.classList.add('hidden');
+            // --- Manejo de la Interfaz (UI) ---
+            function setUIState(mode) {
+                dom.loader.style.display = 'none';
+                dom.downloadResultButton.classList.add('hidden');
+
+                if (mode === 'capture') {
+                    dom.cameraFeed.style.display = 'block';
+                    dom.resultCanvas.style.display = 'none';
+                    dom.cameraControls.classList.remove('hidden');
+                    dom.captureButton.classList.remove('hidden');
+                    dom.predictButton.classList.add('hidden');
+                    dom.galleryUploadButton.style.visibility = 'visible';
+                } else if (mode === 'predict') {
+                    dom.cameraFeed.style.display = 'none';
+                    dom.resultCanvas.style.display = 'block';
+                    dom.cameraControls.classList.add('hidden');
+                    dom.captureButton.classList.add('hidden');
+                    dom.predictButton.classList.remove('hidden');
+                    dom.galleryUploadButton.style.visibility = 'hidden';
+                } else if (mode === 'loading') {
+                    dom.loader.style.display = 'block';
+                    dom.predictButton.classList.add('hidden');
+                } else if (mode === 'result') {
+                    dom.predictButton.classList.add('hidden');
+                    dom.captureButton.classList.remove('hidden');
+                    dom.downloadResultButton.classList.remove('hidden');
+                    dom.galleryUploadButton.style.visibility = 'visible';
+                }
+            }
 
             function displayError(message) {
-                errorMessageDiv.textContent = message;
-                show(errorMessageDiv);
-                setTimeout(() => hide(errorMessageDiv), 4000);
+                dom.errorMessageDiv.textContent = message;
+                dom.errorMessageDiv.classList.add('visible');
+                setTimeout(() => dom.errorMessageDiv.classList.remove('visible'), 4000);
             }
 
             function updateFilter() {
-                cameraFeed.style.filter = `brightness(${currentBrightness}%) contrast(${currentContrast}%)`;
+                dom.cameraFeed.style.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
             }
 
             function resetResultFields() {
-                statusSpan.textContent = "Esperando imagen...";
-                numDeteccionesSpan.textContent = "N/A";
-                uniqueLabelsSpan.textContent = "N/A";
-                avgConfidenceSpan.textContent = "N/A";
-                timestampSpan.textContent = "N/A";
+                dom.statusSpan.textContent = "Listo para capturar";
+                dom.numDeteccionesSpan.textContent = "N/A";
+                dom.uniqueLabelsSpan.textContent = "N/A";
+                dom.avgConfidenceSpan.textContent = "N/A";
+                dom.timestampSpan.textContent = "N/A";
             }
 
-            // --- Lógica de la Cámara ---
+            // --- Lógica Principal (Cámara, Galería, Predicción) ---
             async function startCamera() {
                 try {
-                    if (mediaStream) {
-                        mediaStream.getTracks().forEach(track => track.stop());
+                    if (state.mediaStream) {
+                        state.mediaStream.getTracks().forEach(track => track.stop());
                     }
-                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                    state.mediaStream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: { exact: "environment" }, aspectRatio: 1 }
                     });
-                    cameraFeed.srcObject = mediaStream;
-                    await cameraFeed.play();
-                    
-                    show(cameraFeed);
-                    show(cameraControls);
-                    hide(resultCanvas);
-                    show(captureButton);
-                    hide(predictButton);
+                    dom.cameraFeed.srcObject = state.mediaStream;
+                    await dom.cameraFeed.play();
+                    setUIState('capture');
                     resetResultFields();
                 } catch (err) {
-                    console.error("Error al acceder a la cámara:", err);
-                    displayError("No se pudo acceder a la cámara trasera.");
+                    displayError("Cámara trasera no encontrada o denegada.");
+                    dom.statusSpan.textContent = "Error de cámara";
                 }
             }
-
-            // --- Event Listeners ---
-            captureButton.addEventListener('click', () => {
-                if (!mediaStream) return;
-                
-                // Dibuja la imagen del video al canvas (aplicando el filtro visual)
-                const canvas = document.createElement('canvas');
-                canvas.width = cameraFeed.videoWidth;
-                canvas.height = cameraFeed.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.filter = cameraFeed.style.filter;
-                ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
-                
-                originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
-
-                // Muestra la imagen capturada en el canvas visible
-                resultCanvas.width = canvas.width;
-                resultCanvas.height = canvas.height;
-                resultContext.drawImage(canvas, 0, 0);
-
-                // Detiene la cámara y actualiza la UI
-                mediaStream.getTracks().forEach(track => track.stop());
-                hide(cameraFeed);
-                hide(cameraControls);
-                show(resultCanvas);
-                hide(captureButton);
-                show(predictButton);
-                statusSpan.textContent = "Imagen capturada. Lista para predecir.";
-            });
-
-            galleryUploadButton.addEventListener('click', () => galleryInput.click());
-
-            galleryInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    originalImageBase64 = e.target.result;
-                    const img = new Image();
-                    img.onload = () => {
-                        resultCanvas.width = img.width;
-                        resultCanvas.height = img.height;
-                        resultContext.drawImage(img, 0, 0);
-                        
-                        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-                        hide(cameraFeed);
-                        hide(cameraControls);
-                        show(resultCanvas);
-                        hide(captureButton);
-                        show(predictButton);
-                        statusSpan.textContent = "Imagen cargada. Lista para predecir.";
-                    };
-                    img.src = originalImageBase64;
-                };
-                reader.readAsDataURL(file);
-                event.target.value = null;
-            });
             
-            // Controles de Brillo y Contraste
-            brightnessUpBtn.addEventListener('click', () => { currentBrightness += 5; updateFilter(); });
-            brightnessDownBtn.addEventListener('click', () => { currentBrightness -= 5; updateFilter(); });
-            contrastUpBtn.addEventListener('click', () => { currentContrast += 5; updateFilter(); });
-            contrastDownBtn.addEventListener('click', () => { currentContrast -= 5; updateFilter(); });
+            function handleImageCapture(imageBase64) {
+                state.originalImageBase64 = imageBase64;
+                const img = new Image();
+                img.onload = () => {
+                    dom.resultCanvas.width = img.width;
+                    dom.resultCanvas.height = img.height;
+                    resultContext.drawImage(img, 0, 0);
+                    if (state.mediaStream) state.mediaStream.getTracks().forEach(track => track.stop());
+                    setUIState('predict');
+                    dom.statusSpan.textContent = "Imagen lista para predecir.";
+                };
+                img.src = imageBase64;
+            }
+            
+            async function handlePrediction() {
+                if (!state.originalImageBase64) return displayError("No hay imagen para predecir.");
 
-            // --- Lógica de Predicción ---
-            predictButton.addEventListener('click', async () => {
-                if (!originalImageBase64) {
-                    displayError("No hay imagen para predecir.");
-                    return;
-                }
-
-                show(loader);
-                hide(predictButton);
-                statusSpan.textContent = "Procesando predicción...";
+                setUIState('loading');
+                dom.statusSpan.textContent = "Procesando predicción...";
 
                 try {
-                    const base64Data = originalImageBase64.split(',')[1];
+                    const base64Data = state.originalImageBase64.split(',')[1];
                     const response = await fetch(HF_API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ image_base64: base64Data })
                     });
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
                     
                     const data = await response.json();
-                    if (data.success) {
-                        drawBoundingBoxes(originalImageBase64, data.detecciones);
-                        updateResultFields(data);
-                        savePrediction(data); // Guardar en IndexedDB
-                        statusSpan.textContent = "Predicción completada.";
-                    } else {
-                        throw new Error(data.detail || "La predicción falló.");
-                    }
+                    if (!data.success) throw new Error(data.detail || "La predicción falló.");
+                    
+                    await drawBoundingBoxes(state.originalImageBase64, data.detecciones);
+                    state.predictionImageBase64 = dom.resultCanvas.toDataURL('image/jpeg', 0.9);
+                    
+                    updateResultFields(data);
+                    await savePrediction(data);
+                    setUIState('result');
 
                 } catch (error) {
-                    console.error("Error durante la predicción:", error);
                     displayError(error.message);
-                    statusSpan.textContent = "Error en la predicción.";
-                } finally {
-                    hide(loader);
-                    show(captureButton); // Vuelve a mostrar capturar para un nuevo ciclo
+                    dom.statusSpan.textContent = "Error en predicción.";
+                    setUIState('predict'); // Permitir reintentar
                 }
-            });
-            
+            }
+
             function updateResultFields(data) {
-                timestampSpan.textContent = new Date(data.timestamp).toLocaleTimeString();
-                numDeteccionesSpan.textContent = data.num_detecciones;
-                uniqueLabelsSpan.textContent = data.unique_labels.join(', ') || "Ninguna";
+                dom.statusSpan.textContent = "Predicción completada.";
+                dom.timestampSpan.textContent = new Date(data.timestamp).toLocaleTimeString();
+                dom.numDeteccionesSpan.textContent = data.num_detecciones;
+                dom.uniqueLabelsSpan.textContent = data.unique_labels.join(', ') || "Ninguna";
                 
-                if(data.detecciones.length > 0) {
+                if (data.detecciones.length > 0) {
                     const avgConf = data.detecciones.reduce((acc, d) => acc + d.confidence, 0) / data.detecciones.length;
-                    avgConfidenceSpan.textContent = `${(avgConf * 100).toFixed(1)}%`;
+                    dom.avgConfidenceSpan.textContent = `${(avgConf * 100).toFixed(1)}%`;
                 } else {
-                    avgConfidenceSpan.textContent = "N/A";
+                    dom.avgConfidenceSpan.textContent = "N/A";
                 }
             }
 
             async function drawBoundingBoxes(imgBase64, detections) {
-                const img = new Image();
-                img.onload = () => {
-                    resultCanvas.width = img.width;
-                    resultCanvas.height = img.height;
-                    resultContext.drawImage(img, 0, 0);
+                return new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => {
+                        dom.resultCanvas.width = img.width;
+                        dom.resultCanvas.height = img.height;
+                        resultContext.drawImage(img, 0, 0);
+                        resultContext.lineWidth = Math.max(2, img.width / 200); // Grosor de línea dinámico
+                        resultContext.font = `bold ${Math.max(12, img.width / 30)}px Inter`;
 
-                    resultContext.lineWidth = 3;
-                    resultContext.font = 'bold 18px Inter';
-
-                    detections.forEach(det => {
-                        const [x1, y1, x2, y2] = det.bbox;
-                        const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
-                        const color = '#3498db'; // Color azul para las cajas
-
-                        resultContext.strokeStyle = color;
-                        resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                        
-                        const textMetrics = resultContext.measureText(label);
-                        resultContext.fillStyle = color;
-                        resultContext.fillRect(x1, y1 - 22, textMetrics.width + 10, 22);
-                        
-                        resultContext.fillStyle = '#fff';
-                        resultContext.fillText(label, x1 + 5, y1 - 5);
-                    });
-                };
-                img.src = imgBase64;
+                        detections.forEach(det => {
+                            const [x1, y1, x2, y2] = det.bbox;
+                            const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
+                            resultContext.strokeStyle = var(--primary-blue);
+                            resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                            
+                            const textMetrics = resultContext.measureText(label);
+                            const textHeight = parseInt(resultContext.font, 10);
+                            resultContext.fillStyle = var(--primary-blue);
+                            resultContext.fillRect(x1, y1 - textHeight - 4, textMetrics.width + 10, textHeight + 8);
+                            resultContext.fillStyle = '#fff';
+                            resultContext.fillText(label, x1 + 5, y1 - 4);
+                        });
+                        resolve();
+                    };
+                    img.src = imgBase64;
+                });
             }
 
-            // Iniciar la aplicación
+            // --- Event Listeners ---
+            dom.captureButton.addEventListener('click', () => {
+                if (dom.captureButton.textContent.includes("Reiniciar")) {
+                    startCamera();
+                    dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
+                    return;
+                }
+                if (!state.mediaStream) return;
+                const canvas = document.createElement('canvas');
+                canvas.width = dom.cameraFeed.videoWidth;
+                canvas.height = dom.cameraFeed.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.filter = dom.cameraFeed.style.filter;
+                ctx.drawImage(dom.cameraFeed, 0, 0);
+                handleImageCapture(canvas.toDataURL('image/jpeg', 0.9));
+            });
+
+            dom.galleryUploadButton.addEventListener('click', () => dom.galleryInput.click());
+            dom.galleryInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => handleImageCapture(ev.target.result);
+                reader.readAsDataURL(file);
+                e.target.value = null;
+            });
+            
+            dom.predictButton.addEventListener('click', handlePrediction);
+            
+            dom.downloadResultButton.addEventListener('click', () => {
+                if (!state.predictionImageBase64) return;
+                const a = document.createElement('a');
+                a.href = state.predictionImageBase64;
+                a.download = `pavi_prediccion_${Date.now()}.jpg`;
+                a.click();
+            });
+
+            // Controles de Cámara
+            document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 5; updateFilter(); });
+            document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 5; updateFilter(); });
+            document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 5; updateFilter(); });
+            document.getElementById('contrastDown').addEventListener('click', () => { state.contrast -= 5; updateFilter(); });
+            
+            // Panel de Historial
+            dom.historyButton.addEventListener('click', async () => {
+                await loadHistory();
+                dom.historyPanel.classList.add('open');
+                dom.appContainer.classList.add('history-open');
+                dom.panelOverlay.classList.add('visible');
+            });
+            const closeHistory = () => {
+                dom.historyPanel.classList.remove('open');
+                dom.appContainer.classList.remove('history-open');
+                dom.panelOverlay.classList.remove('visible');
+            };
+            dom.closeHistoryButton.addEventListener('click', closeHistory);
+            dom.panelOverlay.addEventListener('click', closeHistory);
+            dom.historyList.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-history-btn');
+                if (deleteBtn) {
+                    const id = parseInt(deleteBtn.dataset.id, 10);
+                    deleteHistoryItem(id);
+                }
+            });
+
+            // --- Inicialización ---
+            initDB();
             startCamera();
         });
     </script>
 </body>
-</html>
+</html>```
