@@ -40,6 +40,9 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            /* SOLUCIÓN: Bloqueo de zoom y tap highlight */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- Contenedor Principal --- */
@@ -59,20 +62,12 @@
             filter: brightness(0.8) blur(4px);
             pointer-events: none;
         }
-
-        .logo {
-            font-size: 2.5em;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-blue);
-        }
-
+        
         .logo-img {
-            width: 18ch;      /* 3 veces más grande que antes (8ch × 3) */
-            height: auto;     /* mantiene proporción */
+            width: 18ch;
+            height: auto;
             display: block;
-            margin: 0 auto 20px auto;  /* centra horizontalmente y agrega bottom margin */
+            margin: 0 auto 20px auto;
         }
 
         main {
@@ -471,14 +466,28 @@
                 }
             }
             
-            function handleImageFromSource(imageBase64) {
-                state.originalImageBase64 = imageBase64;
+            function handleImageFromSource(imageBase64, applyFilter = false) {
                 const img = new Image();
                 img.onload = () => {
-                    dom.resultCanvas.width = img.width;
-                    dom.resultCanvas.height = img.height;
-                    resultContext.drawImage(img, 0, 0);
-                    if (state.mediaStream) state.mediaStream.getTracks().forEach(track => track.stop());
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+
+                    if (applyFilter) {
+                        ctx.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
+                    }
+                    
+                    ctx.drawImage(img, 0, 0);
+                    state.originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+                    dom.resultCanvas.width = canvas.width;
+                    dom.resultCanvas.height = canvas.height;
+                    resultContext.drawImage(canvas, 0, 0);
+
+                    if (state.mediaStream) {
+                        state.mediaStream.getTracks().forEach(track => track.stop());
+                    }
                     setUIState('predict');
                     dom.statusSpan.textContent = "Imagen lista para predecir.";
                 };
@@ -571,9 +580,10 @@
                 canvas.width = dom.cameraFeed.videoWidth;
                 canvas.height = dom.cameraFeed.videoHeight;
                 const ctx = canvas.getContext('2d');
-                ctx.filter = dom.cameraFeed.style.filter;
-                ctx.drawImage(dom.cameraFeed, 0, 0);
-                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9));
+                // SOLUCIÓN: Aplicar filtro directamente desde el estado al capturar
+                ctx.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
+                ctx.drawImage(dom.cameraFeed, 0, 0, canvas.width, canvas.height);
+                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9), false); // El filtro ya está aplicado
             });
 
             dom.galleryUploadButton.addEventListener('click', () => dom.galleryInput.click());
@@ -596,10 +606,11 @@
                 a.click();
             });
 
-            document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 5; updateFilter(); });
-            document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 5; updateFilter(); });
-            document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 5; updateFilter(); });
-            document.getElementById('contrastDown').addEventListener('click', () => { state.contrast -= 5; updateFilter(); });
+            // SOLUCIÓN: Incremento de 10 en 10
+            document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 10; updateFilter(); });
+            document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 10; updateFilter(); });
+            document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 10; updateFilter(); });
+            document.getElementById('contrastDown').addEventListener('click', () => { state.contrast -= 10; updateFilter(); });
             
             dom.historyButton.addEventListener('click', async () => {
                 await loadHistory();
