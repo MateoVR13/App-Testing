@@ -3,162 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>App de Predicción de Patologías de Pavimento Rígido Móvil</title>
-    <!-- Opcional: Fuente Inter de Google Fonts para un estilo más moderno -->
+    <title>Pavimind</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos de Material Design -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        /* --- Estilos Generales y Liquid Glass --- */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.2);
+            --button-bg-alpha: 0.2;
+            --button-border-alpha: 0.3;
+            --button-hover-shadow: rgba(0, 0, 0, 0.3);
+            --primary-blue: #007bff; /* Azul vibrante */
+            --primary-blue-dark: #0056b3;
+            --secondary-green: #28a745; /* Verde para historial */
+            --secondary-green-dark: #218838;
+            --secondary-yellow: #ffc107; /* Amarillo para galería */
+            --secondary-yellow-dark: #e0a800;
+            --accent-purple: #6f42c1; /* Púrpura para predecir */
+            --accent-purple-dark: #5a32a3;
+            --text-light: #e0e0e0;
+            --text-dark: #333;
+            --card-dark: #3a3a3a;
+            --card-light: #4c4c4c;
+        }
+
+        /* --- General & Glassmorphism Base --- */
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* Fondo degradado azul */
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #2a0a57 0%, #4f2c81 100%); /* Degradado púrpura oscuro */
+            color: var(--text-light);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* Evitar scroll horizontal */
+            overflow-x: hidden;
+            position: relative;
+            animation: backgroundShift 15s ease infinite alternate; /* Animación de fondo */
+        }
+
+        @keyframes backgroundShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Destellos y brillos */
+        .glass-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .glass-overlay::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+            animation: shine 10s infinite alternate;
+        }
+
+        @keyframes shine {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.7; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
         }
 
         .container {
             width: 95%;
-            max-width: 600px;
+            max-width: 450px; /* Ajustado para un look más móvil */
             margin: 20px auto;
             padding: 25px;
             box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.1); /* Blanco semi-transparente */
+            background: var(--glass-bg);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px); /* Efecto Liquid Glass */
-            -webkit-backdrop-filter: blur(10px); /* Para compatibilidad con Safari */
-            color: #e0e0e0;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            backdrop-filter: blur(15px) saturate(180%); /* Intensificado el blur */
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
             text-align: center;
+            position: relative; /* Para el brillo interno */
+            overflow: hidden; /* Para contener el brillo */
+            transition: all 0.3s ease-in-out;
         }
 
-        h1 {
-            color: #a8dadc; /* Azul claro */
-            margin-bottom: 25px;
-            font-size: 2em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        /* Brillo interno para el contenedor */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+            z-index: 1;
         }
 
-        /* --- Estilos de Botones --- */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        button, .file-upload-button {
-            padding: 12px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            border: none;
-            border-radius: 10px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.5em;
+            font-weight: 700;
             color: #fff;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.2); /* Base para los botones */
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            flex: 1 1 auto; /* Permite que los botones crezcan/reduzcan su tamaño */
-            min-width: 150px; /* Ancho mínimo para los botones */
+            margin-bottom: 25px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #8a2be2, #007bff, #00BCD4); /* Degradado de color para el logo */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
         }
 
-        button:hover, .file-upload-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-        }
-
-        /* Colores específicos para botones */
-        #openCameraButton { background-color: #4CAF50; } /* Verde */
-        #openCameraButton:hover { background-color: #45a049; }
-        #uploadGalleryButton { background-color: #2196F3; } /* Azul */
-        #uploadGalleryButton:hover { background-color: #1976D2; }
-        #takePictureButton { background-color: #FFC107; color: #333;} /* Ámbar */
-        #takePictureButton:hover { background-color: #FFA000; }
-        #predictButton { background-color: #9C27B0; } /* Púrpura */
-        #predictButton:hover { background-color: #7B1FA2; }
-        #downloadResultButton { background-color: #00BCD4; } /* Cian */
-        #downloadResultButton:hover { background-color: #0097A7; }
-
-        /* Ocultar el input de archivo de la galería */
-        #galleryInput {
-            display: none;
-        }
-
-        /* --- Estilos de Video y Canvas --- */
-        video, canvas {
+        /* --- Controles Inferiores (Botones de acción principal) --- */
+        .bottom-controls {
+            display: flex;
+            justify-content: space-around;
             width: 100%;
-            max-width: 400px; /* Limitar el ancho para mantener 1:1 */
-            height: auto; /* La altura se ajustará con la relación de aspecto */
-            aspect-ratio: 1 / 1; /* Forzar relación de aspecto 1:1 */
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro para cámara/canvas */
-            display: none; /* Oculto por defecto */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        #resultCanvas {
-            max-width: 100%; /* Asegurar que no se desborde */
-            height: auto;
-            object-fit: contain; /* Asegurar que la imagen encaje bien */
-        }
-
-        /* --- Estilos de Resultados --- */
-        .results-section {
             margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            gap: 10px;
         }
-        .results-section h2 {
-            color: #a8dadc;
-            font-size: 1.6em;
-            margin-bottom: 15px;
-            text-align: center;
+
+        .bottom-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, var(--button-bg-alpha));
+            border: 1px solid rgba(255, 255, 255, var(--button-border-alpha));
+            border-radius: 50%; /* Botón redondo */
+            width: 70px; /* Tamaño del botón redondo */
+            height: 70px;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--button-hover-shadow);
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.75em;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        .prediction-details {
+
+        .bottom-button::before { /* Efecto de brillo al pasar el ratón */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+        }
+
+        .bottom-button:hover::before {
+            left: 100%;
+        }
+
+        .bottom-button .material-icons {
+            font-size: 32px;
+            margin-bottom: 3px;
+            transition: transform 0.3s ease;
+        }
+        .bottom-button:hover .material-icons {
+            transform: translateY(-2px);
+        }
+        .bottom-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px var(--button-hover-shadow);
+        }
+
+        /* Colores específicos para los botones inferiores */
+        #historyButton { background-color: var(--secondary-green); }
+        #historyButton:hover { background-color: var(--secondary-green-dark); }
+        #galleryUploadButton { background-color: var(--secondary-yellow); color: var(--text-dark); }
+        #galleryUploadButton:hover { background-color: var(--secondary-yellow-dark); }
+
+        /* Botón central "Capturar" */
+        #captureButton {
+            background: linear-gradient(45deg, var(--primary-blue), #00BCD4); /* Azul vibrante */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px; /* Forma de píldora */
+            width: 150px; /* Ancho ajustable */
+            height: 60px; /* Altura ajustable */
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            color: #fff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            flex-grow: 1; /* Permitir que crezca en el flexbox */
+            max-width: 180px; /* Limitar el ancho */
+        }
+        #captureButton .material-icons {
+            font-size: 28px;
+        }
+        #captureButton:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
+        }
+        #captureButton::before { /* Efecto de brillo al pasar el ratón */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+        }
+        #captureButton:hover::before {
+            left: 100%;
+        }
+
+        /* Botón de "Predecir" */
+        #predictButton {
+            background: linear-gradient(45deg, var(--accent-purple), #8a2be2);
+            box-shadow: 0 6px 20px rgba(111, 66, 193, 0.4);
+        }
+        #predictButton:hover {
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.6);
+        }
+
+        /* --- Cámara y Controles de Ajuste --- */
+        .camera-preview-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* Para forzar un aspect ratio de 1:1 */
+            background-color: var(--card-dark);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 15px rgba(0,0,0,0.2);
+            display: none; /* Oculto por defecto */
+        }
+
+        .camera-preview-container video,
+        .camera-preview-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que el video/imagen cubra el contenedor */
+            border-radius: 15px;
+        }
+
+        .camera-controls-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3); /* Fondo semitransparente para los controles */
+            border-radius: 10px;
+            margin: 0 10px;
+        }
+        .camera-control-button {
             background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-light);
+            font-size: 0.9em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        .camera-control-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .camera-control-button .material-icons {
+            font-size: 20px;
+        }
+
+        /* Resultado de la Predicción */
+        .prediction-results {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 15px;
             padding: 20px;
             margin-top: 20px;
             text-align: left;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .prediction-details p {
-            margin: 8px 0;
-            line-height: 1.6;
-            color: #f0f0f0;
-        }
-        .prediction-details strong {
-            color: #66BB6A; /* Verde claro para etiquetas */
-        }
-        pre {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
-            border-radius: 8px;
-            max-height: 250px;
-            overflow-y: auto;
-            font-size: 0.85em;
-            line-height: 1.4;
-            color: #e0e0e0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px var(--glass-shadow);
+            display: none; /* Oculto por defecto */
+            position: relative;
+            overflow: hidden;
         }
 
-        /* --- Animación de Carga --- */
+        .prediction-results::before { /* Brillo interno */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .prediction-results h2 {
+            color: #7ef5ff; /* Azul cian brillante */
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            font-size: 0.95em;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item strong {
+            color: #a8dadc;
+        }
+        .result-item span {
+            color: #f0f0f0;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .tag {
+            background-color: rgba(70, 130, 180, 0.5); /* Azul acero semitransparente */
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .result-image-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-button .material-icons {
+            font-size: 20px;
+        }
+
+        #downloadResultButton {
+            background-color: #00BCD4; /* Cian */
+            color: var(--text-dark);
+        }
+        #downloadResultButton:hover {
+            background-color: #0097A7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+        }
+
+        /* --- Loader y Errores --- */
         .loader {
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-top: 4px solid #a8dadc;
@@ -174,10 +428,9 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* --- Mensajes de Error --- */
         .error-message {
-            color: #FFEBEE; /* Rojo claro */
-            background-color: #C62828; /* Rojo más oscuro */
+            color: #FFEBEE;
+            background-color: rgba(200, 50, 50, 0.7);
             border: 1px solid #FFCDD2;
             border-radius: 10px;
             padding: 15px;
@@ -186,380 +439,503 @@
             display: none;
             font-weight: bold;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- Historial (IndexedDB) --- */
+        .history-panel {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Oculto por defecto */
+            width: 85%;
+            max-width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: -8px 0 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: right 0.4s ease-in-out;
+        }
+        .history-panel.open {
+            right: 0;
+        }
+        .history-panel h2 {
+            color: #7ef5ff;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .history-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px; /* Espacio para la barra de scroll */
+        }
+        .history-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            position: relative;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        .history-item img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .history-item p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .history-item strong {
+            color: #90CAF9; /* Azul claro */
+        }
+        .history-item .delete-history-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            opacity: 0.8;
+        }
+        .history-item .delete-history-btn:hover {
+            background: rgba(255, 0, 0, 0.8);
+            opacity: 1;
+        }
+
+        .close-history-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: #fff;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .close-history-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Contenedor principal de la app cuando el historial está abierto */
+        .container.history-open {
+            filter: blur(5px) brightness(0.7);
+            transform: translateX(-15%); /* Mover ligeramente el contenido principal */
+            pointer-events: none; /* Deshabilitar interacciones */
+            opacity: 0.7;
         }
 
         /* --- Ajustes Responsivos para móviles --- */
-        @media (max-width: 600px) {
+        @media (max-width: 480px) {
             .container {
                 margin: 0;
                 border-radius: 0;
                 box-shadow: none;
                 padding: 15px;
                 width: 100%;
-                min-height: 100vh; /* Ocupar toda la altura en móviles */
+                min-height: 100vh;
             }
-            h1 {
-                font-size: 1.8em;
+            .logo {
+                font-size: 2em;
             }
-            button, .file-upload-button {
+            .bottom-controls {
+                flex-wrap: wrap; /* Permitir que los botones se envuelvan */
+                justify-content: center;
+                gap: 8px;
+                margin-top: 20px;
+            }
+            .bottom-button, #captureButton {
+                width: 60px;
+                height: 60px;
+                font-size: 0.7em;
+            }
+            #captureButton {
+                width: 120px;
+                height: 50px;
+                font-size: 1em;
+            }
+            .bottom-button .material-icons, #captureButton .material-icons {
+                font-size: 28px;
+            }
+            .history-panel {
                 width: 100%;
-                font-size: 0.95em;
-                padding: 10px 15px;
+                border-left: none;
             }
-            .controls {
-                flex-direction: column;
-                gap: 10px;
+            .camera-controls-overlay {
+                flex-wrap: wrap;
+                margin: 0 5px;
             }
-            video, canvas {
-                width: 100%; /* Ancho completo en pantallas pequeñas */
-                height: auto;
+            .camera-control-button {
+                padding: 6px 10px;
+                font-size: 0.8em;
+                gap: 3px;
+            }
+            .camera-control-button .material-icons {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Predicción Móvil</h1>
+    <div class="glass-overlay"></div> <!-- Para los brillos y destellos globales -->
 
-        <div class="controls">
-            <button id="openCameraButton">Abrir Cámara</button>
-            <input type="file" id="galleryInput" accept="image/*">
-            <button id="uploadGalleryButton" class="file-upload-button">Subir Imagen</button>
-            <button id="takePictureButton">Tomar Foto</button>
-            <button id="predictButton">Predecir</button>
-            <button id="downloadResultButton">Descargar Imagen</button>
+    <div class="container" id="appContainer">
+        <h1 class="logo">Pavimind</h1>
+
+        <div class="camera-preview-container" id="cameraPreviewContainer">
+            <video id="cameraFeed" autoplay playsinline></video>
+            <canvas id="resultCanvas"></canvas> <!-- Para mostrar la imagen capturada y las predicciones -->
+            <div class="camera-controls-overlay">
+                <button class="camera-control-button" id="brightnessDown"><span class="material-icons">brightness_low</span> -</button>
+                <button class="camera-control-button" id="brightnessUp"><span class="material-icons">brightness_high</span> +</button>
+                <button class="camera-control-button" id="contrastDown"><span class="material-icons">tonality</span> -</button>
+                <button class="camera-control-button" id="contrastUp"><span class="material-icons">tonality</span> +</button>
+            </div>
         </div>
-
-        <video id="cameraFeed" autoplay playsinline></video>
-        <!-- Canvas oculto para capturar la imagen original de la cámara/galería -->
-        <canvas id="captureCanvas" style="display: none;"></canvas>
-        <!-- Canvas visible para mostrar la imagen con las cajas delimitadoras -->
-        <canvas id="resultCanvas"></canvas>
-
+        
         <div class="loader" id="loader"></div>
         <div class="error-message" id="errorMessage"></div>
 
-        <div class="results-section">
+        <div class="prediction-results" id="predictionDetails">
             <h2>Resultados de la Predicción</h2>
-            <div id="predictionDetails" class="prediction-details" style="display: none;">
-                <p><strong>Fecha y Hora:</strong> <span id="timestamp"></span></p>
-                <p><strong>Etiquetas Únicas:</strong> <span id="uniqueLabels"></span></p>
-                <p><strong>Número de Detecciones:</strong> <span id="numDetecciones"></span></p>
-                <p><strong>Detalles Completos (JSON):</strong></p>
-                <pre id="rawPredictionData"></pre>
+            <div class="result-item"><strong>Fecha y Hora:</strong> <span id="timestamp"></span></div>
+            <div class="result-item"><strong>Número de Detecciones:</strong> <span id="numDetecciones"></span></div>
+            <div class="result-item"><strong>Etiquetas Únicas:</strong></div>
+            <div class="tag-list" id="uniqueLabelsContainer"></div>
+            <div class="result-item" style="flex-direction: column; align-items: flex-start;">
+                <strong>Detalles por Detección:</strong>
+                <pre id="rawPredictionData" style="width: 100%;"></pre>
             </div>
+            <div class="result-image-actions">
+                <button id="downloadResultButton" class="action-button"><span class="material-icons">download</span> Descargar</button>
+            </div>
+        </div>
+
+        <div class="bottom-controls">
+            <button id="historyButton" class="bottom-button"><span class="material-icons">history</span> Historial</button>
+            <input type="file" id="galleryInput" accept="image/*" style="display: none;">
+            <button id="galleryUploadButton" class="bottom-button"><span class="material-icons">image</span> Galería</button>
+            <button id="captureButton" class="bottom-button" style="display: none;"><span class="material-icons">camera_alt</span> Capturar</button>
+            <button id="predictButton" class="bottom-button" style="display: none;"><span class="material-icons">data_object</span> Predecir</button>
+        </div>
+
+    </div>
+
+    <!-- Panel de Historial (Inicialmente oculto) -->
+    <div class="history-panel" id="historyPanel">
+        <button class="close-history-btn" id="closeHistoryButton"><span class="material-icons">close</span></button>
+        <h2><span class="material-icons">history</span> Historial de Predicciones</h2>
+        <div class="history-list" id="historyList">
+            <!-- Los elementos del historial se cargarán aquí -->
         </div>
     </div>
 
+
     <script>
-        const openCameraButton = document.getElementById('openCameraButton');
-        const uploadGalleryButton = document.getElementById('uploadGalleryButton');
-        const galleryInput = document.getElementById('galleryInput');
-        const takePictureButton = document.getElementById('takePictureButton');
-        const predictButton = document.getElementById('predictButton');
-        const downloadResultButton = document.getElementById('downloadResultButton');
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos del DOM ---
+            const cameraFeed = document.getElementById('cameraFeed');
+            const resultCanvas = document.getElementById('resultCanvas');
+            const resultContext = resultCanvas.getContext('2d');
+            const cameraControls = document.querySelector('.camera-controls-overlay');
+            const loader = document.getElementById('loader');
+            const errorMessageDiv = document.getElementById('errorMessage');
 
-        const cameraFeed = document.getElementById('cameraFeed');
-        const captureCanvas = document.getElementById('captureCanvas'); // Canvas oculto para la imagen original
-        const captureContext = captureCanvas.getContext('2d');
-        const resultCanvas = document.getElementById('resultCanvas'); // Canvas visible para el resultado
-        const resultContext = resultCanvas.getContext('2d');
+            // Botones
+            const historyButton = document.getElementById('historyButton');
+            const galleryUploadButton = document.getElementById('galleryUploadButton');
+            const galleryInput = document.getElementById('galleryInput');
+            const captureButton = document.getElementById('captureButton');
+            const predictButton = document.getElementById('predictButton');
 
-        const predictionDetailsDiv = document.getElementById('predictionDetails');
-        const timestampSpan = document.getElementById('timestamp');
-        const uniqueLabelsSpan = document.getElementById('uniqueLabels');
-        const numDeteccionesSpan = document.getElementById('numDetecciones');
-        const rawPredictionDataPre = document.getElementById('rawPredictionData');
-        const loader = document.getElementById('loader');
-        const errorMessageDiv = document.getElementById('errorMessage');
+            // Controles de cámara
+            const brightnessUpBtn = document.getElementById('brightnessUp');
+            const brightnessDownBtn = document.getElementById('brightnessDown');
+            const contrastUpBtn = document.getElementById('contrastUp');
+            const contrastDownBtn = document.getElementById('contrastDown');
 
-        let mediaStream = null;
-        let originalImageBase64 = null; // Almacena la imagen original en base64 para redibujar en el cliente
+            // Campos de resultados
+            const statusSpan = document.getElementById('status');
+            const numDeteccionesSpan = document.getElementById('numDetecciones');
+            const uniqueLabelsSpan = document.getElementById('uniqueLabels');
+            const avgConfidenceSpan = document.getElementById('avgConfidence');
+            const timestampSpan = document.getElementById('timestamp');
 
-        // TODO: REEMPLAZA ESTA URL CON LA URL DE TU ENDPOINT DE PREDICCIÓN DE HUGGING FACE
-        // Ejemplo: "https://tu-usuario-tu-espacio-de-hf.hf.space/predict"
-        const HF_API_URL = "https://mateovr13-api-web-rigido.hf.space/predict";
+            // --- Estado de la aplicación ---
+            let mediaStream = null;
+            let originalImageBase64 = null;
+            let currentBrightness = 100;
+            let currentContrast = 100;
+            
+            // TODO: REEMPLAZA ESTA URL
+            const HF_API_URL = "https://mateovr13-api-web-rigido.hf.space/predict";
 
-        // --- Funciones auxiliares para la UI ---
-        function show(element) { element.style.display = 'block'; }
-        function hide(element) { element.style.display = 'none'; }
-        function displayError(message) {
-            errorMessageDiv.textContent = message;
-            show(errorMessageDiv);
-        }
-        function clearError() {
-            hide(errorMessageDiv);
-            errorMessageDiv.textContent = '';
-        }
-
-        function resetUIState() {
-            hide(cameraFeed);
-            hide(takePictureButton);
-            hide(predictButton);
-            hide(downloadResultButton);
-            hide(resultCanvas);
-            hide(predictionDetailsDiv);
-            show(openCameraButton);
-            show(uploadGalleryButton);
-            clearError();
-            clearCanvas(captureCanvas);
-            clearCanvas(resultCanvas);
-            originalImageBase64 = null; // Limpiar la imagen original
-            if (mediaStream) { // Detener cualquier stream de cámara activo
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
+            // --- Lógica de IndexedDB para el Historial ---
+            let db;
+            function initDB() {
+                const request = indexedDB.open("PavimindHistoryDB", 1);
+                request.onerror = (event) => console.error("Error al abrir IndexedDB:", event);
+                request.onsuccess = (event) => { db = event.target.result; };
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    db.createObjectStore("predictions", { keyPath: "id", autoIncrement: true });
+                };
             }
-        }
+            initDB();
 
-        function clearCanvas(canvas) {
-            const context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.width = 0; // Resetear dimensiones del canvas
-            canvas.height = 0;
-        }
+            function savePrediction(predictionData) {
+                if (!db) return;
+                const transaction = db.transaction(["predictions"], "readwrite");
+                const store = transaction.objectStore("predictions");
+                store.add(predictionData);
+            }
+            
+            // Placeholder para mostrar historial
+            historyButton.addEventListener('click', () => {
+                alert("La visualización del historial aún no está implementada en esta interfaz, pero los datos se guardan en segundo plano.");
+            });
 
-        // --- Manejo de la Cámara ---
-        openCameraButton.addEventListener('click', async () => {
-            resetUIState();
-            try {
-                // Solicitar acceso a la cámara trasera con relación de aspecto 1:1
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { exact: "environment" },
-                        aspectRatio: { exact: 1 } // Forzar 1:1
+            // --- Funciones de UI ---
+            const show = (el) => el.classList.remove('hidden');
+            const hide = (el) => el.classList.add('hidden');
+
+            function displayError(message) {
+                errorMessageDiv.textContent = message;
+                show(errorMessageDiv);
+                setTimeout(() => hide(errorMessageDiv), 4000);
+            }
+
+            function updateFilter() {
+                cameraFeed.style.filter = `brightness(${currentBrightness}%) contrast(${currentContrast}%)`;
+            }
+
+            function resetResultFields() {
+                statusSpan.textContent = "Esperando imagen...";
+                numDeteccionesSpan.textContent = "N/A";
+                uniqueLabelsSpan.textContent = "N/A";
+                avgConfidenceSpan.textContent = "N/A";
+                timestampSpan.textContent = "N/A";
+            }
+
+            // --- Lógica de la Cámara ---
+            async function startCamera() {
+                try {
+                    if (mediaStream) {
+                        mediaStream.getTracks().forEach(track => track.stop());
                     }
-                });
-                cameraFeed.srcObject = mediaStream;
-                await new Promise(resolve => cameraFeed.onloadedmetadata = resolve); // Esperar a que el video cargue los metadatos
-
-                // Ajustar el canvas de captura a la resolución del video (será 1:1)
-                captureCanvas.width = cameraFeed.videoWidth;
-                captureCanvas.height = cameraFeed.videoHeight;
-
-                show(cameraFeed);
-                show(takePictureButton);
-                hide(openCameraButton);
-                hide(uploadGalleryButton); // Ocultar botón de subir imagen cuando la cámara está activa
-            } catch (err) {
-                console.error("Error al acceder a la cámara:", err);
-                if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-                    displayError("No se encontró una cámara trasera. Asegúrate de que tu dispositivo tenga una y de dar permisos.");
-                } else if (err.name === "NotAllowedError" || err.name === "SecurityError") {
-                    displayError("Permiso de cámara denegado. Por favor, concede acceso a la cámara en la configuración de tu navegador.");
-                } else {
-                    displayError(`Error inesperado al abrir la cámara: ${err.message}`);
-                }
-                resetUIState(); // Volver al estado inicial
-            }
-        });
-
-        takePictureButton.addEventListener('click', () => {
-            clearError();
-            if (mediaStream && cameraFeed.srcObject && cameraFeed.readyState === 4) { // readyState 4 significa que hay datos suficientes para reproducir
-                captureContext.drawImage(cameraFeed, 0, 0, captureCanvas.width, captureCanvas.height);
-                originalImageBase64 = captureCanvas.toDataURL('image/jpeg', 0.9); // Guardar la imagen original en base64
-
-                // Detener el stream de la cámara
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-                cameraFeed.srcObject = null;
-                hide(cameraFeed);
-
-                // Mostrar la imagen capturada en el canvas de resultado para previsualización
-                const img = new Image();
-                img.onload = () => {
-                    resultCanvas.width = img.width;
-                    resultCanvas.height = img.height;
-                    resultContext.drawImage(img, 0, 0);
-                    show(resultCanvas);
-                };
-                img.src = originalImageBase64;
-
-                show(predictButton);
-                hide(takePictureButton);
-                show(openCameraButton); // Dar opción de abrir cámara de nuevo
-                show(uploadGalleryButton); // Dar opción de subir de galería de nuevo
-            } else {
-                displayError("Primero abre la cámara y asegúrate de que esté lista para tomar una foto.");
-            }
-        });
-
-        // --- Manejo de la Galería ---
-        uploadGalleryButton.addEventListener('click', () => {
-            galleryInput.click(); // Simular clic en el input de tipo file oculto
-        });
-
-        galleryInput.addEventListener('change', (event) => {
-            clearError();
-            resetUIState(); // Resetear UI, pero mantener los botones de acción visibles
-
-            const file = event.target.files[0];
-            if (!file) {
-                return;
-            }
-
-            if (!file.type.startsWith('image/')) {
-                displayError("Por favor, selecciona un archivo de imagen válido.");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                originalImageBase64 = e.target.result;
-                const img = new Image();
-                img.onload = () => {
-                    // Ajustar el captureCanvas a las dimensiones de la imagen cargada
-                    captureCanvas.width = img.width;
-                    captureCanvas.height = img.height;
-                    captureContext.drawImage(img, 0, 0, img.width, img.height);
-
-                    // Mostrar la imagen original en el canvas de resultado para previsualización
-                    resultCanvas.width = img.width;
-                    resultCanvas.height = img.height;
-                    resultContext.drawImage(img, 0, 0);
-                    show(resultCanvas);
-
-                    show(predictButton);
-                    hide(takePictureButton); // No hay botón de "tomar foto" para imágenes de galería
-                };
-                img.onerror = () => {
-                    displayError("No se pudo cargar la imagen seleccionada.");
-                    resetUIState();
-                };
-                img.src = originalImageBase64;
-            };
-            reader.onerror = () => {
-                displayError("Error al leer el archivo de imagen.");
-                resetUIState();
-            };
-            reader.readAsDataURL(file); // Leer el archivo como Base64 Data URL
-            event.target.value = null; // Limpiar el input file para permitir subir el mismo archivo de nuevo
-        });
-
-        // --- Envío para Predicción y Dibujo de Cajas ---
-        predictButton.addEventListener('click', async () => {
-            clearError();
-            hide(predictionDetailsDiv);
-            hide(downloadResultButton);
-
-            if (!originalImageBase64) {
-                displayError("Primero toma una foto o sube una imagen.");
-                return;
-            }
-
-            show(loader);
-            hide(predictButton);
-
-            try {
-                // Enviar solo la parte Base64 (sin el prefijo "data:image/jpeg;base64,")
-                const base64Data = originalImageBase64.split(',')[1];
-                
-                const response = await fetch(HF_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ image_base64: base64Data })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: `Error HTTP ${response.status}` }));
-                    throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("Prediction Result:", data);
-
-                if (data.success) {
-                    // Dibujar la imagen original y luego las cajas delimitadoras en el cliente
-                    await drawBoundingBoxes(originalImageBase64, data.detecciones, data.unique_labels);
-
-                    // Mostrar los detalles de la predicción
-                    timestampSpan.textContent = new Date(data.timestamp).toLocaleString();
-                    uniqueLabelsSpan.textContent = data.unique_labels && data.unique_labels.length > 0 ? data.unique_labels.join(', ') : 'Ninguna detección';
-                    numDeteccionesSpan.textContent = data.num_detecciones;
-                    rawPredictionDataPre.textContent = JSON.stringify(data.detecciones, null, 2);
-                    
-                    show(predictionDetailsDiv);
-                    show(downloadResultButton);
-                } else {
-                    displayError("La predicción falló: " + (data.detail || "Error desconocido"));
-                }
-
-            } catch (error) {
-                console.error("Error durante la predicción:", error);
-                displayError("Error al realizar la predicción: " + error.message);
-            } finally {
-                hide(loader);
-                show(predictButton); // Mostrar el botón de predecir de nuevo por si se quiere reintentar
-            }
-        });
-
-        // --- Función para Dibujar Cajas Delimitadoras en el Canvas del Cliente ---
-        async function drawBoundingBoxes(imgBase64, detections, uniqueLabels) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    resultCanvas.width = img.width;
-                    resultCanvas.height = img.height;
-                    resultContext.drawImage(img, 0, 0); // Dibujar la imagen original
-
-                    resultContext.lineWidth = 2;
-                    resultContext.strokeStyle = '#00FF00'; // Color del borde de la caja
-                    resultContext.fillStyle = '#00FF00'; // Color de fondo del texto
-                    resultContext.font = 'bold 16px Arial';
-
-                    detections.forEach(detection => {
-                        const [x1, y1, x2, y2] = detection.bbox;
-                        const label = detection.class;
-                        const confidence = detection.confidence;
-
-                        // Dibujar caja delimitadora
-                        resultContext.beginPath();
-                        resultContext.rect(x1, y1, x2 - x1, y2 - y1);
-                        resultContext.stroke();
-
-                        // Preparar texto de la etiqueta
-                        const text = `${label} (${(confidence * 100).toFixed(1)}%)`;
-                        const textMetrics = resultContext.measureText(text);
-                        const textWidth = textMetrics.width;
-                        const textHeight = parseInt(resultContext.font, 10); // Aproximación para la altura de la fuente
-
-                        // Dibujar fondo para la etiqueta
-                        resultContext.fillRect(x1, y1 - textHeight - 5, textWidth + 10, textHeight + 5);
-
-                        // Dibujar texto de la etiqueta
-                        resultContext.fillStyle = '#000000'; // Texto negro para mejor contraste
-                        resultContext.fillText(text, x1 + 5, y1 - 5);
-                        resultContext.fillStyle = '#00FF00'; // Restablecer el color de relleno para la siguiente caja
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: "environment" }, aspectRatio: 1 }
                     });
-                    show(resultCanvas);
-                    resolve();
+                    cameraFeed.srcObject = mediaStream;
+                    await cameraFeed.play();
+                    
+                    show(cameraFeed);
+                    show(cameraControls);
+                    hide(resultCanvas);
+                    show(captureButton);
+                    hide(predictButton);
+                    resetResultFields();
+                } catch (err) {
+                    console.error("Error al acceder a la cámara:", err);
+                    displayError("No se pudo acceder a la cámara trasera.");
+                }
+            }
+
+            // --- Event Listeners ---
+            captureButton.addEventListener('click', () => {
+                if (!mediaStream) return;
+                
+                // Dibuja la imagen del video al canvas (aplicando el filtro visual)
+                const canvas = document.createElement('canvas');
+                canvas.width = cameraFeed.videoWidth;
+                canvas.height = cameraFeed.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.filter = cameraFeed.style.filter;
+                ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+                
+                originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+                // Muestra la imagen capturada en el canvas visible
+                resultCanvas.width = canvas.width;
+                resultCanvas.height = canvas.height;
+                resultContext.drawImage(canvas, 0, 0);
+
+                // Detiene la cámara y actualiza la UI
+                mediaStream.getTracks().forEach(track => track.stop());
+                hide(cameraFeed);
+                hide(cameraControls);
+                show(resultCanvas);
+                hide(captureButton);
+                show(predictButton);
+                statusSpan.textContent = "Imagen capturada. Lista para predecir.";
+            });
+
+            galleryUploadButton.addEventListener('click', () => galleryInput.click());
+
+            galleryInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    originalImageBase64 = e.target.result;
+                    const img = new Image();
+                    img.onload = () => {
+                        resultCanvas.width = img.width;
+                        resultCanvas.height = img.height;
+                        resultContext.drawImage(img, 0, 0);
+                        
+                        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+                        hide(cameraFeed);
+                        hide(cameraControls);
+                        show(resultCanvas);
+                        hide(captureButton);
+                        show(predictButton);
+                        statusSpan.textContent = "Imagen cargada. Lista para predecir.";
+                    };
+                    img.src = originalImageBase64;
+                };
+                reader.readAsDataURL(file);
+                event.target.value = null;
+            });
+            
+            // Controles de Brillo y Contraste
+            brightnessUpBtn.addEventListener('click', () => { currentBrightness += 5; updateFilter(); });
+            brightnessDownBtn.addEventListener('click', () => { currentBrightness -= 5; updateFilter(); });
+            contrastUpBtn.addEventListener('click', () => { currentContrast += 5; updateFilter(); });
+            contrastDownBtn.addEventListener('click', () => { currentContrast -= 5; updateFilter(); });
+
+            // --- Lógica de Predicción ---
+            predictButton.addEventListener('click', async () => {
+                if (!originalImageBase64) {
+                    displayError("No hay imagen para predecir.");
+                    return;
+                }
+
+                show(loader);
+                hide(predictButton);
+                statusSpan.textContent = "Procesando predicción...";
+
+                try {
+                    const base64Data = originalImageBase64.split(',')[1];
+                    const response = await fetch(HF_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image_base64: base64Data })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        drawBoundingBoxes(originalImageBase64, data.detecciones);
+                        updateResultFields(data);
+                        savePrediction(data); // Guardar en IndexedDB
+                        statusSpan.textContent = "Predicción completada.";
+                    } else {
+                        throw new Error(data.detail || "La predicción falló.");
+                    }
+
+                } catch (error) {
+                    console.error("Error durante la predicción:", error);
+                    displayError(error.message);
+                    statusSpan.textContent = "Error en la predicción.";
+                } finally {
+                    hide(loader);
+                    show(captureButton); // Vuelve a mostrar capturar para un nuevo ciclo
+                }
+            });
+            
+            function updateResultFields(data) {
+                timestampSpan.textContent = new Date(data.timestamp).toLocaleTimeString();
+                numDeteccionesSpan.textContent = data.num_detecciones;
+                uniqueLabelsSpan.textContent = data.unique_labels.join(', ') || "Ninguna";
+                
+                if(data.detecciones.length > 0) {
+                    const avgConf = data.detecciones.reduce((acc, d) => acc + d.confidence, 0) / data.detecciones.length;
+                    avgConfidenceSpan.textContent = `${(avgConf * 100).toFixed(1)}%`;
+                } else {
+                    avgConfidenceSpan.textContent = "N/A";
+                }
+            }
+
+            async function drawBoundingBoxes(imgBase64, detections) {
+                const img = new Image();
+                img.onload = () => {
+                    resultCanvas.width = img.width;
+                    resultCanvas.height = img.height;
+                    resultContext.drawImage(img, 0, 0);
+
+                    resultContext.lineWidth = 3;
+                    resultContext.font = 'bold 18px Inter';
+
+                    detections.forEach(det => {
+                        const [x1, y1, x2, y2] = det.bbox;
+                        const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
+                        const color = '#3498db'; // Color azul para las cajas
+
+                        resultContext.strokeStyle = color;
+                        resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                        
+                        const textMetrics = resultContext.measureText(label);
+                        resultContext.fillStyle = color;
+                        resultContext.fillRect(x1, y1 - 22, textMetrics.width + 10, 22);
+                        
+                        resultContext.fillStyle = '#fff';
+                        resultContext.fillText(label, x1 + 5, y1 - 5);
+                    });
                 };
                 img.src = imgBase64;
-                img.onerror = () => {
-                    displayError("Error al cargar la imagen original para dibujar las cajas.");
-                    resolve(); // Resuelve incluso en error para no bloquear la app
-                };
-            });
-        }
-
-        // --- Descargar Imagen con Predicciones ---
-        downloadResultButton.addEventListener('click', () => {
-            if (resultCanvas.style.display !== 'none' && resultCanvas.width > 0) {
-                const a = document.createElement('a');
-                a.href = resultCanvas.toDataURL('image/jpeg', 0.9); // Obtener imagen del canvas con cajas
-                a.download = `yolo_prediction_${new Date().toISOString().replace(/:/g, '-')}.jpg`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } else {
-                displayError("No hay imagen de predicción para descargar.");
             }
-        });
 
-        // --- Inicialización al cargar la página ---
-        window.addEventListener('load', resetUIState);
+            // Iniciar la aplicación
+            startCamera();
+        });
     </script>
 </body>
 </html>
