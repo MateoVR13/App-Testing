@@ -9,16 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        /* --- PALETA DE COLORES MODO OSCURO --- */
         :root {
-            --bg-color: #f0f2f5;
-            --text-color: #333;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --glass-shadow: rgba(0, 0, 0, 0.08);
-            --primary-blue: #007aff;
-            --secondary-green: #34c759;
-            --secondary-yellow: #ffcc00;
-            --accent-purple: #af52de;
+            --bg-color: #1c1c1e; /* Fondo oscuro tipo iOS */
+            --text-color: #f0f0f0; /* Texto principal claro */
+            --text-color-secondary: #a0a0a0; /* Texto secundario grisáceo */
+            --glass-bg: rgba(44, 44, 46, 0.65); /* Gris oscuro traslúcido para las tarjetas */
+            --glass-border: rgba(255, 255, 255, 0.1); /* Borde blanco sutil */
+            --glass-shadow: rgba(0, 0, 0, 0.2); /* Sombra más oscura */
+            --primary-blue: #0a84ff; /* Azul más vibrante para modo oscuro */
+            --secondary-green: #30d158;
+            --secondary-yellow: #ffd60a;
+            --accent-purple: #bf5af2;
         }
 
         /* --- Reseteo y Estilos Base --- */
@@ -40,7 +42,6 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            /* SOLUCIÓN: Bloqueo de zoom y tap highlight */
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
@@ -49,7 +50,7 @@
         .container {
             width: 100%;
             max-width: 450px;
-            height: 100vh; /* Ocupa toda la altura en móviles */
+            height: 100vh;
             max-height: 950px;
             background: var(--bg-color);
             display: flex;
@@ -59,7 +60,7 @@
         }
         .container.history-open {
             transform: translateX(-50px) scale(0.95);
-            filter: brightness(0.8) blur(4px);
+            filter: brightness(0.5) blur(4px);
             pointer-events: none;
         }
         
@@ -68,6 +69,8 @@
             height: auto;
             display: block;
             margin: 0 auto 20px auto;
+            /* Filtro para invertir el logo para el modo oscuro */
+            filter: invert(1) hue-rotate(180deg);
         }
 
         main {
@@ -95,7 +98,7 @@
         .camera-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background-color: #e0e0e0;
+            background-color: #2c2c2e; /* Fondo del visor oscuro */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,14 +123,14 @@
             justify-content: center;
             gap: 8px;
             padding: 8px;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.2);
             backdrop-filter: blur(5px);
             border-radius: 12px;
         }
         .camera-control-button {
             flex: 1;
             padding: 8px;
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             border-radius: 8px;
             color: var(--text-color);
@@ -151,11 +154,11 @@
             align-items: center;
             font-size: 0.95em;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .result-item:last-child { border-bottom: none; }
-        .result-item strong { color: #555; }
-        .result-item span { color: #000; font-weight: 600; text-align: right; }
+        .result-item strong { color: var(--text-color-secondary); }
+        .result-item span { color: var(--text-color); font-weight: 600; text-align: right; }
 
         /* --- Controles Inferiores y Animación Bubble --- */
         .bottom-controls {
@@ -175,16 +178,16 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             color: white;
             cursor: pointer;
         }
         .action-button .material-icons { font-size: 32px; }
-        .action-button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
-        .action-button:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .action-button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); }
+        .action-button:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
 
         #historyButton { background-color: var(--secondary-green); }
-        #galleryUploadButton { background-color: var(--secondary-yellow); color: var(--text-color); }
+        #galleryUploadButton { background-color: var(--secondary-yellow); color: #333; }
         #downloadResultButton { background-color: #00bcd4; }
 
         #captureButton, #predictButton {
@@ -201,7 +204,7 @@
         #predictButton { background: var(--accent-purple); }
 
         /* --- Loader y Errores --- */
-        .loader { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; }
+        .loader { border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid var(--primary-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; }
         @keyframes spin {0%{transform: rotate(0deg); }100% { transform: rotate(360deg);}}
         .error-message { color: white; background-color: #ff3b30; border-radius: 12px; padding: 15px; text-align: center; font-weight: 600; position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; }
         .error-message.visible { opacity: 1; transform: translateY(0); }
@@ -209,7 +212,7 @@
         .hidden { display: none !important; }
 
         /* --- Panel de Historial --- */
-        #panelOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); z-index: 998; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+        #panelOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
         #panelOverlay.visible { opacity: 1; pointer-events: auto; }
         
         .history-panel {
@@ -229,17 +232,17 @@
             padding: 20px;
             transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .history-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0,0,0,0.15); }
+        .history-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0,0,0,0.25); }
         
         .history-header { display: flex; align-items: center; margin-bottom: 20px; }
         .history-header h2 { font-size: 1.8em; color: var(--primary-blue); flex-grow: 1; text-align: center; }
-        #closeHistoryButton { background: #e5e5ea; color: #8e8e93; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        #closeHistoryButton { background: #3a3a3c; color: #a0a0a0; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
         .history-list { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-        .history-item { background: rgba(255, 255, 255, 0.8); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .history-item { background: rgba(58, 58, 60, 0.8); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; }
         .history-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
-        .history-item p { margin: 4px 0; font-size: 0.9em; color: #555; }
-        .history-item p strong { color: #111; }
+        .history-item p { margin: 4px 0; font-size: 0.9em; color: #b0b0b0; }
+        .history-item p strong { color: #f0f0f0; }
         .delete-history-btn { position: absolute; top: 10px; right: 10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; opacity: 0.8; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
         .delete-history-btn .material-icons { font-size: 18px; }
         .delete-history-btn:hover { opacity: 1; transform: scale(1.1); }
@@ -298,8 +301,8 @@
     </div>
 
     <script>
+        // El código JavaScript no necesita cambios para el tema oscuro, por lo que se mantiene idéntico.
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Constantes y Elementos del DOM ---
             const HF_API_URL = "https://mateovr13-api-web-rigido.hf.space/predict";
             const dom = {
                 appContainer: document.getElementById('appContainer'),
@@ -326,7 +329,6 @@
             };
             const resultContext = dom.resultCanvas.getContext('2d');
 
-            // --- Estado de la Aplicación ---
             let state = {
                 mediaStream: null,
                 originalImageBase64: null,
@@ -337,7 +339,6 @@
                 isProcessing: false,
             };
 
-            // --- Lógica de la Base de Datos (IndexedDB) ---
             function initDB() {
                 const request = indexedDB.open("PavimindHistoryDB", 2);
                 request.onerror = (e) => console.error("Error DB:", e);
@@ -369,7 +370,7 @@
                 allRecords.onsuccess = () => {
                     dom.historyList.innerHTML = '';
                     if (allRecords.result.length === 0) {
-                        dom.historyList.innerHTML = '<p style="text-align: center; color: #888;">No hay predicciones guardadas.</p>';
+                        dom.historyList.innerHTML = '<p style="text-align: center; color: var(--text-color-secondary);">No hay predicciones guardadas.</p>';
                         return;
                     }
                     allRecords.result.reverse().forEach(rec => {
@@ -395,7 +396,6 @@
                 await loadHistory();
             }
 
-            // --- Manejo de la Interfaz (UI) ---
             function setUIState(mode) {
                 dom.loader.style.display = 'none';
                 dom.downloadResultButton.classList.add('hidden');
@@ -447,7 +447,6 @@
                 dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
-            // --- Lógica Principal ---
             async function startCamera() {
                 try {
                     if (state.mediaStream) {
@@ -549,16 +548,18 @@
                         resultContext.drawImage(img, 0, 0);
                         resultContext.lineWidth = Math.max(2, img.width / 200);
                         resultContext.font = `bold ${Math.max(12, img.width / 30)}px Inter`;
-
+                        
+                        const color = '#0a84ff'; // Usar el azul vibrante del modo oscuro
+                        
                         detections.forEach(det => {
                             const [x1, y1, x2, y2] = det.bbox;
                             const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
-                            resultContext.strokeStyle = '#007aff';
+                            resultContext.strokeStyle = color;
                             resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
                             
                             const textMetrics = resultContext.measureText(label);
                             const textHeight = parseInt(resultContext.font, 10);
-                            resultContext.fillStyle = '#007aff';
+                            resultContext.fillStyle = color;
                             resultContext.fillRect(x1, y1 - textHeight - 4, textMetrics.width + 10, textHeight + 8);
                             resultContext.fillStyle = '#fff';
                             resultContext.fillText(label, x1 + 5, y1 - 4);
@@ -569,7 +570,6 @@
                 });
             }
 
-            // --- Event Listeners ---
             dom.captureButton.addEventListener('click', () => {
                 if (dom.captureButton.textContent.includes("Reiniciar")) {
                     startCamera();
@@ -580,10 +580,9 @@
                 canvas.width = dom.cameraFeed.videoWidth;
                 canvas.height = dom.cameraFeed.videoHeight;
                 const ctx = canvas.getContext('2d');
-                // SOLUCIÓN: Aplicar filtro directamente desde el estado al capturar
                 ctx.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
                 ctx.drawImage(dom.cameraFeed, 0, 0, canvas.width, canvas.height);
-                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9), false); // El filtro ya está aplicado
+                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9), false);
             });
 
             dom.galleryUploadButton.addEventListener('click', () => dom.galleryInput.click());
@@ -606,7 +605,6 @@
                 a.click();
             });
 
-            // SOLUCIÓN: Incremento de 10 en 10
             document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 10; updateFilter(); });
             document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 10; updateFilter(); });
             document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 10; updateFilter(); });
@@ -633,7 +631,6 @@
                 }
             });
 
-            // --- Inicialización ---
             initDB();
             startCamera();
         });
