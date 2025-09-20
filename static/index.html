@@ -66,6 +66,13 @@
             margin-bottom: 20px;
             color: var(--primary-blue);
         }
+
+        .logo-img {
+            height: 2em;      /* igual que un H1 típico */
+            width: auto;      /* mantiene proporción */
+            display: inline-block; 
+            vertical-align: middle; /* opcional: centra con respecto a línea base */
+        }
         
         main {
             flex-grow: 1;
@@ -246,7 +253,7 @@
     <div id="panelOverlay"></div>
 
     <div class="container" id="appContainer">
-        <h1 class="logo">PAVIMIND</h1>
+        <img src="https://i.postimg.cc/bNz1nFWv/civial.png" alt="PAVIMIND Logo" class="logo-img">
 
         <main>
             <div class="glass-card camera-preview-container">
