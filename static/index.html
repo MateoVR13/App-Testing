@@ -236,7 +236,8 @@
         .history-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
         .history-item p { margin: 4px 0; font-size: 0.9em; color: #555; }
         .history-item p strong { color: #111; }
-        .delete-history-btn { position: absolute; top: 10px; right: 10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; opacity: 0.8; transition: all 0.2s ease; }
+        .delete-history-btn { position: absolute; top: 10px; right: 10px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; opacity: 0.8; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .delete-history-btn .material-icons { font-size: 18px; }
         .delete-history-btn:hover { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
@@ -329,6 +330,7 @@
                 brightness: 100,
                 contrast: 100,
                 db: null,
+                isProcessing: false,
             };
 
             // --- Lógica de la Base de Datos (IndexedDB) ---
@@ -393,6 +395,7 @@
             function setUIState(mode) {
                 dom.loader.style.display = 'none';
                 dom.downloadResultButton.classList.add('hidden');
+                state.isProcessing = false;
 
                 if (mode === 'capture') {
                     dom.cameraFeed.style.display = 'block';
@@ -411,9 +414,11 @@
                 } else if (mode === 'loading') {
                     dom.loader.style.display = 'block';
                     dom.predictButton.classList.add('hidden');
+                    state.isProcessing = true;
                 } else if (mode === 'result') {
                     dom.predictButton.classList.add('hidden');
                     dom.captureButton.classList.remove('hidden');
+                    dom.captureButton.innerHTML = '<span class="material-icons">restart_alt</span> Reiniciar';
                     dom.downloadResultButton.classList.remove('hidden');
                     dom.galleryUploadButton.style.visibility = 'visible';
                 }
@@ -435,9 +440,10 @@
                 dom.uniqueLabelsSpan.textContent = "N/A";
                 dom.avgConfidenceSpan.textContent = "N/A";
                 dom.timestampSpan.textContent = "N/A";
+                dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
-            // --- Lógica Principal (Cámara, Galería, Predicción) ---
+            // --- Lógica Principal ---
             async function startCamera() {
                 try {
                     if (state.mediaStream) {
@@ -456,7 +462,7 @@
                 }
             }
             
-            function handleImageCapture(imageBase64) {
+            function handleImageFromSource(imageBase64) {
                 state.originalImageBase64 = imageBase64;
                 const img = new Image();
                 img.onload = () => {
@@ -471,7 +477,7 @@
             }
             
             async function handlePrediction() {
-                if (!state.originalImageBase64) return displayError("No hay imagen para predecir.");
+                if (!state.originalImageBase64 || state.isProcessing) return;
 
                 setUIState('loading');
                 dom.statusSpan.textContent = "Procesando predicción...";
@@ -491,18 +497,18 @@
                     await drawBoundingBoxes(state.originalImageBase64, data.detecciones);
                     state.predictionImageBase64 = dom.resultCanvas.toDataURL('image/jpeg', 0.9);
                     
-                    updateResultFields(data);
+                    updateResultFieldsUI(data);
                     await savePrediction(data);
                     setUIState('result');
 
                 } catch (error) {
                     displayError(error.message);
                     dom.statusSpan.textContent = "Error en predicción.";
-                    setUIState('predict'); // Permitir reintentar
+                    setUIState('predict');
                 }
             }
 
-            function updateResultFields(data) {
+            function updateResultFieldsUI(data) {
                 dom.statusSpan.textContent = "Predicción completada.";
                 dom.timestampSpan.textContent = new Date(data.timestamp).toLocaleTimeString();
                 dom.numDeteccionesSpan.textContent = data.num_detecciones;
@@ -523,18 +529,18 @@
                         dom.resultCanvas.width = img.width;
                         dom.resultCanvas.height = img.height;
                         resultContext.drawImage(img, 0, 0);
-                        resultContext.lineWidth = Math.max(2, img.width / 200); // Grosor de línea dinámico
+                        resultContext.lineWidth = Math.max(2, img.width / 200);
                         resultContext.font = `bold ${Math.max(12, img.width / 30)}px Inter`;
 
                         detections.forEach(det => {
                             const [x1, y1, x2, y2] = det.bbox;
                             const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
-                            resultContext.strokeStyle = var(--primary-blue);
+                            resultContext.strokeStyle = '#007aff';
                             resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
                             
                             const textMetrics = resultContext.measureText(label);
                             const textHeight = parseInt(resultContext.font, 10);
-                            resultContext.fillStyle = var(--primary-blue);
+                            resultContext.fillStyle = '#007aff';
                             resultContext.fillRect(x1, y1 - textHeight - 4, textMetrics.width + 10, textHeight + 8);
                             resultContext.fillStyle = '#fff';
                             resultContext.fillText(label, x1 + 5, y1 - 4);
@@ -549,7 +555,6 @@
             dom.captureButton.addEventListener('click', () => {
                 if (dom.captureButton.textContent.includes("Reiniciar")) {
                     startCamera();
-                    dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
                     return;
                 }
                 if (!state.mediaStream) return;
@@ -559,7 +564,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.filter = dom.cameraFeed.style.filter;
                 ctx.drawImage(dom.cameraFeed, 0, 0);
-                handleImageCapture(canvas.toDataURL('image/jpeg', 0.9));
+                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9));
             });
 
             dom.galleryUploadButton.addEventListener('click', () => dom.galleryInput.click());
@@ -567,7 +572,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = (ev) => handleImageCapture(ev.target.result);
+                reader.onload = (ev) => handleImageFromSource(ev.target.result);
                 reader.readAsDataURL(file);
                 e.target.value = null;
             });
@@ -582,13 +587,11 @@
                 a.click();
             });
 
-            // Controles de Cámara
             document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 5; updateFilter(); });
             document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 5; updateFilter(); });
             document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 5; updateFilter(); });
             document.getElementById('contrastDown').addEventListener('click', () => { state.contrast -= 5; updateFilter(); });
             
-            // Panel de Historial
             dom.historyButton.addEventListener('click', async () => {
                 await loadHistory();
                 dom.historyPanel.classList.add('open');
