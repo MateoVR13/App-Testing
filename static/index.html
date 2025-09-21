@@ -68,7 +68,7 @@
             width: 20ch;
             height: auto;
             display: block;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 15px auto;
         }
 
         main {
@@ -78,6 +78,33 @@
             gap: 20px;
             width: 100%;
         }
+
+        /* --- Interruptor de Modelo --- */
+        .model-switch-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .switch-label {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--text-color-secondary);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 30px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3a3c; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+        input:checked + .slider { background-color: var(--accent-purple); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
 
         /* --- Estilo Liquid Glass --- */
         .glass-card {
@@ -111,32 +138,22 @@
             border-radius: 16px;
         }
         
-        .camera-controls-overlay {
+        .camera-instructions-overlay {
             position: absolute;
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px;
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(5px);
+            padding: 10px;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
         }
-        .camera-control-button {
-            flex: 1;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
-            color: var(--text-color);
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-        .camera-control-button:active { transform: scale(0.95); }
 
         .prediction-results {
             flex-grow: 1;
@@ -146,58 +163,21 @@
             justify-content: space-around;
         }
         
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95em;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+        .result-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.95em; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .result-item:last-child { border-bottom: none; }
         .result-item strong { color: var(--text-color-secondary); }
         .result-item span { color: var(--text-color); font-weight: 600; text-align: right; }
 
         /* --- Controles Inferiores y Animación Bubble --- */
-        .bottom-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding-top: 20px;
-        }
-        
-        .action-button {
-            border: none;
-            border-radius: 50%;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            color: white;
-            cursor: pointer;
-        }
+        .bottom-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-top: 20px; }
+        .action-button { border: none; border-radius: 50%; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); color: white; cursor: pointer; }
         .action-button .material-icons { font-size: 32px; }
         .action-button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); }
         .action-button:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
-
         #historyButton { background-color: var(--secondary-green); }
         #galleryUploadButton { background-color: var(--secondary-yellow); color: #333; }
         #downloadResultButton { background-color: #00bcd4; }
-
-        #captureButton, #predictButton {
-            width: auto;
-            min-width: 140px;
-            height: 64px;
-            border-radius: 32px;
-            font-size: 1.1em;
-            font-weight: 600;
-            padding: 0 20px;
-            gap: 10px;
-        }
+        #captureButton, #predictButton { width: auto; min-width: 140px; height: 64px; border-radius: 32px; font-size: 1.1em; font-weight: 600; padding: 0 20px; gap: 10px; }
         #captureButton { background: var(--primary-blue); }
         #predictButton { background: var(--accent-purple); }
 
@@ -206,36 +186,16 @@
         @keyframes spin {0%{transform: rotate(0deg); }100% { transform: rotate(360deg);}}
         .error-message { color: white; background-color: #ff3b30; border-radius: 12px; padding: 15px; text-align: center; font-weight: 600; position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; }
         .error-message.visible { opacity: 1; transform: translateY(0); }
-        
         .hidden { display: none !important; }
 
         /* --- Panel de Historial --- */
         #panelOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
         #panelOverlay.visible { opacity: 1; pointer-events: auto; }
-        
-        .history-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 90%;
-            max-width: 400px;
-            height: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-left: 1px solid var(--glass-border);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
+        .history-panel { position: fixed; top: 0; right: -100%; width: 90%; max-width: 400px; height: 100%; background: var(--glass-bg); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border-left: 1px solid var(--glass-border); z-index: 999; display: flex; flex-direction: column; padding: 20px; transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .history-panel.open { right: 0; box-shadow: -10px 0 40px rgba(0,0,0,0.25); }
-        
         .history-header { display: flex; align-items: center; margin-bottom: 20px; }
         .history-header h2 { font-size: 1.8em; color: var(--primary-blue); flex-grow: 1; text-align: center; }
         #closeHistoryButton { background: #3a3a3c; color: #a0a0a0; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        
         .history-list { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
         .history-item { background: rgba(58, 58, 60, 0.8); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; }
         .history-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
@@ -251,16 +211,22 @@
 
     <div class="container" id="appContainer">
         <img src="https://i.postimg.cc/bNz1nFWv/civial.png" alt="PAVIMIND Logo" class="logo-img">
+        
+        <div class="model-switch-container">
+            <span class="switch-label">Rígido</span>
+            <label class="switch">
+                <input type="checkbox" id="modelToggle">
+                <span class="slider round"></span>
+            </label>
+            <span class="switch-label">Flexible</span>
+        </div>
 
         <main>
             <div class="glass-card camera-preview-container">
                 <video id="cameraFeed" autoplay playsinline></video>
                 <canvas id="resultCanvas"></canvas>
-                <div class="camera-controls-overlay hidden">
-                    <button class="camera-control-button" id="brightnessDown">B-</button>
-                    <button class="camera-control-button" id="brightnessUp">B+</button>
-                    <button class="camera-control-button" id="contrastDown">C-</button>
-                    <button class="camera-control-button" id="contrastUp">C+</button>
+                <div class="camera-instructions-overlay">
+                    <p>Tome las fotos en el sentido vial y a una altura entre 60cm y 120cm</p>
                 </div>
                 <div class="loader" id="loader"></div>
             </div>
@@ -293,20 +259,22 @@
             <button id="closeHistoryButton"><span class="material-icons">close</span></button>
             <h2>Historial</h2>
         </div>
-        <div class="history-list" id="historyList">
-            <!-- El historial se cargará aquí -->
-        </div>
+        <div class="history-list" id="historyList"></div>
     </div>
 
     <script>
-        // El código JavaScript no necesita cambios para el tema oscuro, por lo que se mantiene idéntico.
         document.addEventListener('DOMContentLoaded', () => {
-            const HF_API_URL = "https://mateovr13-api-web-rigido.hf.space/predict";
+            // --- URLs de las APIs ---
+            const API_URL_RIGIDO = "https://mateovr13-api-web-rigido.hf.space/predict";
+            const API_URL_FLEXIBLE = "https://mateovr13-api-web-flexible.hf.space/predict";
+            let currentApiUrl = API_URL_RIGIDO; // Inicia con el modelo Rígido por defecto
+
+            // --- Referencias al DOM ---
             const dom = {
                 appContainer: document.getElementById('appContainer'),
                 cameraFeed: document.getElementById('cameraFeed'),
                 resultCanvas: document.getElementById('resultCanvas'),
-                cameraControls: document.querySelector('.camera-controls-overlay'),
+                cameraInstructions: document.querySelector('.camera-instructions-overlay'),
                 loader: document.getElementById('loader'),
                 errorMessageDiv: document.getElementById('errorMessage'),
                 historyButton: document.getElementById('historyButton'),
@@ -315,6 +283,7 @@
                 captureButton: document.getElementById('captureButton'),
                 predictButton: document.getElementById('predictButton'),
                 downloadResultButton: document.getElementById('downloadResultButton'),
+                modelToggle: document.getElementById('modelToggle'),
                 statusSpan: document.getElementById('status'),
                 numDeteccionesSpan: document.getElementById('numDetecciones'),
                 uniqueLabelsSpan: document.getElementById('uniqueLabels'),
@@ -327,16 +296,16 @@
             };
             const resultContext = dom.resultCanvas.getContext('2d');
 
+            // --- Estado de la aplicación ---
             let state = {
                 mediaStream: null,
                 originalImageBase64: null,
                 predictionImageBase64: null,
-                brightness: 100,
-                contrast: 100,
                 db: null,
                 isProcessing: false,
             };
-
+            
+            // --- Base de Datos (IndexedDB) para el Historial ---
             function initDB() {
                 const request = indexedDB.open("PavimindHistoryDB", 2);
                 request.onerror = (e) => console.error("Error DB:", e);
@@ -394,6 +363,7 @@
                 await loadHistory();
             }
 
+            // --- Control de la Interfaz de Usuario (UI) ---
             function setUIState(mode) {
                 dom.loader.style.display = 'none';
                 dom.downloadResultButton.classList.add('hidden');
@@ -402,14 +372,14 @@
                 if (mode === 'capture') {
                     dom.cameraFeed.style.display = 'block';
                     dom.resultCanvas.style.display = 'none';
-                    dom.cameraControls.classList.remove('hidden');
+                    dom.cameraInstructions.classList.remove('hidden');
                     dom.captureButton.classList.remove('hidden');
                     dom.predictButton.classList.add('hidden');
                     dom.galleryUploadButton.style.visibility = 'visible';
                 } else if (mode === 'predict') {
                     dom.cameraFeed.style.display = 'none';
                     dom.resultCanvas.style.display = 'block';
-                    dom.cameraControls.classList.add('hidden');
+                    dom.cameraInstructions.classList.add('hidden');
                     dom.captureButton.classList.add('hidden');
                     dom.predictButton.classList.remove('hidden');
                     dom.galleryUploadButton.style.visibility = 'hidden';
@@ -432,10 +402,6 @@
                 setTimeout(() => dom.errorMessageDiv.classList.remove('visible'), 4000);
             }
 
-            function updateFilter() {
-                dom.cameraFeed.style.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
-            }
-
             function resetResultFields() {
                 dom.statusSpan.textContent = "Listo para capturar";
                 dom.numDeteccionesSpan.textContent = "N/A";
@@ -445,14 +411,20 @@
                 dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
+            // --- Lógica de Cámara y Predicción ---
             async function startCamera() {
                 try {
+                    // Si ya hay un stream de video, lo detenemos antes de pedir uno nuevo.
                     if (state.mediaStream) {
                         state.mediaStream.getTracks().forEach(track => track.stop());
                     }
+                    
+                    // Pedimos acceso a la cámara. El navegador recuerda el permiso otorgado.
+                    // No volverá a preguntar si el usuario ya lo aceptó para este sitio.
                     state.mediaStream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: { exact: "environment" }, aspectRatio: 1 }
                     });
+                    
                     dom.cameraFeed.srcObject = state.mediaStream;
                     await dom.cameraFeed.play();
                     setUIState('capture');
@@ -463,18 +435,13 @@
                 }
             }
             
-            function handleImageFromSource(imageBase64, applyFilter = false) {
+            function handleImageFromSource(imageBase64) {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
-
-                    if (applyFilter) {
-                        ctx.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
-                    }
-                    
                     ctx.drawImage(img, 0, 0);
                     state.originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
@@ -499,7 +466,7 @@
 
                 try {
                     const base64Data = state.originalImageBase64.split(',')[1];
-                    const response = await fetch(HF_API_URL, {
+                    const response = await fetch(currentApiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ image_base64: base64Data })
@@ -545,9 +512,9 @@
                         dom.resultCanvas.height = img.height;
                         resultContext.drawImage(img, 0, 0);
                         resultContext.lineWidth = Math.max(2, img.width / 200);
-                        resultContext.font = `bold ${Math.max(12, img.width / 30)}px Inter`;
+                        resultContext.font = `bold ${Math.max(12, img.width / 30)}px Lexend`;
                         
-                        const color = '#0a84ff'; // Usar el azul vibrante del modo oscuro
+                        const color = '#0a84ff';
                         
                         detections.forEach(det => {
                             const [x1, y1, x2, y2] = det.bbox;
@@ -568,6 +535,7 @@
                 });
             }
 
+            // --- Event Listeners ---
             dom.captureButton.addEventListener('click', () => {
                 if (dom.captureButton.textContent.includes("Reiniciar")) {
                     startCamera();
@@ -578,11 +546,10 @@
                 canvas.width = dom.cameraFeed.videoWidth;
                 canvas.height = dom.cameraFeed.videoHeight;
                 const ctx = canvas.getContext('2d');
-                ctx.filter = `brightness(${state.brightness}%) contrast(${state.contrast}%)`;
                 ctx.drawImage(dom.cameraFeed, 0, 0, canvas.width, canvas.height);
-                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9), false);
+                handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9));
             });
-
+            
             dom.galleryUploadButton.addEventListener('click', () => dom.galleryInput.click());
             dom.galleryInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -603,10 +570,10 @@
                 a.click();
             });
 
-            document.getElementById('brightnessUp').addEventListener('click', () => { state.brightness += 10; updateFilter(); });
-            document.getElementById('brightnessDown').addEventListener('click', () => { state.brightness -= 10; updateFilter(); });
-            document.getElementById('contrastUp').addEventListener('click', () => { state.contrast += 10; updateFilter(); });
-            document.getElementById('contrastDown').addEventListener('click', () => { state.contrast -= 10; updateFilter(); });
+            dom.modelToggle.addEventListener('change', () => {
+                currentApiUrl = dom.modelToggle.checked ? API_URL_FLEXIBLE : API_URL_RIGIDO;
+                displayError(`Modelo cambiado a ${dom.modelToggle.checked ? 'Flexible' : 'Rígido'}.`);
+            });
             
             dom.historyButton.addEventListener('click', async () => {
                 await loadHistory();
@@ -629,6 +596,7 @@
                 }
             });
 
+            // --- Inicio de la Aplicación ---
             initDB();
             startCamera();
         });
