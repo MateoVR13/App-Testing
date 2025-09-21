@@ -9,30 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        /* --- PALETA DE COLORES MODO OSCURO --- */
         :root {
-            --bg-color: #1c1c1e; /* Fondo oscuro tipo iOS */
-            --text-color: #f0f0f0; /* Texto principal claro */
-            --text-color-secondary: #a0a0a0; /* Texto secundario grisáceo */
-            --glass-bg: rgba(44, 44, 46, 0.65); /* Gris oscuro traslúcido para las tarjetas */
-            --glass-border: rgba(255, 255, 255, 0.1); /* Borde blanco sutil */
-            --glass-shadow: rgba(0, 0, 0, 0.2); /* Sombra más oscura */
-            --primary-blue: #0a84ff; /* Azul más vibrante para modo oscuro */
+            --bg-color: #1c1c1e;
+            --text-color: #f0f0f0;
+            --text-color-secondary: #a0a0a0;
+            --glass-bg: rgba(44, 44, 46, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.2);
+            --primary-blue: #0a84ff;
             --secondary-green: #30d158;
             --secondary-yellow: #ffd60a;
             --accent-purple: #bf5af2;
         }
 
-        /* --- Reseteo y Estilos Base --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: "Lexend", sans-serif;
-            font-optical-sizing: auto;
             font-weight: 500;
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -46,7 +39,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- Contenedor Principal --- */
         .container {
             width: 100%;
             max-width: 450px;
@@ -64,40 +56,12 @@
             pointer-events: none;
         }
         
-        .logo-img {
-            width: 20ch;
-            height: auto;
-            display: block;
-            margin: 0 auto 15px auto;
-        }
+        .logo-img { width: 20ch; height: auto; display: block; margin: 0 auto 15px auto; }
+        main { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; width: 100%; }
 
-        main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        /* --- Interruptor de Modelo --- */
-        .model-switch-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .switch-label {
-            font-weight: 600;
-            font-size: 0.9em;
-            color: var(--text-color-secondary);
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 54px;
-            height: 30px;
-        }
+        .model-switch-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .switch-label { font-weight: 600; font-size: 0.9em; color: var(--text-color-secondary); }
+        .switch { position: relative; display: inline-block; width: 54px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3a3c; transition: .4s; }
         .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
@@ -106,7 +70,6 @@
         .slider.round { border-radius: 34px; }
         .slider.round:before { border-radius: 50%; }
 
-        /* --- Estilo Liquid Glass --- */
         .glass-card {
             background: var(--glass-bg);
             border-radius: 24px;
@@ -119,24 +82,16 @@
             transition: all 0.3s ease;
         }
 
-        /* --- Cámara y Resultados --- */
         .camera-preview-container {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background-color: #2c2c2e; /* Fondo del visor oscuro */
+            background-color: #2c2c2e;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 10px;
         }
-
-        .camera-preview-container video,
-        .camera-preview-container canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 16px;
-        }
+        .camera-preview-container video, .camera-preview-container canvas { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
         
         .camera-instructions-overlay {
             position: absolute;
@@ -147,28 +102,42 @@
             padding: 10px;
             background: rgba(0,0,0,0.35);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
             text-align: center;
             font-size: 0.85em;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
+            opacity: 0; /* Inicia oculto */
+            transition: opacity 0.5s ease-in-out;
         }
 
-        .prediction-results {
-            flex-grow: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
+        .camera-utility-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: none; /* Inicia oculto */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
-        
+        .camera-utility-button:active { transform: scale(0.9); }
+        .camera-utility-button.active { background-color: var(--primary-blue); }
+        .camera-utility-button .material-icons { font-size: 22px; }
+
+        .prediction-results { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; justify-content: space-around; }
         .result-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.95em; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .result-item:last-child { border-bottom: none; }
         .result-item strong { color: var(--text-color-secondary); }
         .result-item span { color: var(--text-color); font-weight: 600; text-align: right; }
 
-        /* --- Controles Inferiores y Animación Bubble --- */
         .bottom-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-top: 20px; }
         .action-button { border: none; border-radius: 50%; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); color: white; cursor: pointer; }
         .action-button .material-icons { font-size: 32px; }
@@ -181,14 +150,12 @@
         #captureButton { background: var(--primary-blue); }
         #predictButton { background: var(--accent-purple); }
 
-        /* --- Loader y Errores --- */
         .loader { border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid var(--primary-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; }
         @keyframes spin {0%{transform: rotate(0deg); }100% { transform: rotate(360deg);}}
         .error-message { color: white; background-color: #ff3b30; border-radius: 12px; padding: 15px; text-align: center; font-weight: 600; position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; }
         .error-message.visible { opacity: 1; transform: translateY(0); }
         .hidden { display: none !important; }
 
-        /* --- Panel de Historial --- */
         #panelOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
         #panelOverlay.visible { opacity: 1; pointer-events: auto; }
         .history-panel { position: fixed; top: 0; right: -100%; width: 90%; max-width: 400px; height: 100%; background: var(--glass-bg); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border-left: 1px solid var(--glass-border); z-index: 999; display: flex; flex-direction: column; padding: 20px; transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -225,7 +192,10 @@
             <div class="glass-card camera-preview-container">
                 <video id="cameraFeed" autoplay playsinline></video>
                 <canvas id="resultCanvas"></canvas>
-                <div class="camera-instructions-overlay">
+                <button id="highContrastButton" class="camera-utility-button" title="Activar modo alto contraste">
+                    <span class="material-icons">tonality</span>
+                </button>
+                <div id="cameraInstructions" class="camera-instructions-overlay">
                     <p>Tome las fotos en el sentido vial y a una altura entre 60cm y 120cm</p>
                 </div>
                 <div class="loader" id="loader"></div>
@@ -264,17 +234,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- URLs de las APIs ---
             const API_URL_RIGIDO = "https://mateovr13-api-web-rigido.hf.space/predict";
             const API_URL_FLEXIBLE = "https://mateovr13-api-web-flexible.hf.space/predict";
-            let currentApiUrl = API_URL_RIGIDO; // Inicia con el modelo Rígido por defecto
+            let currentApiUrl = API_URL_RIGIDO;
 
-            // --- Referencias al DOM ---
             const dom = {
                 appContainer: document.getElementById('appContainer'),
                 cameraFeed: document.getElementById('cameraFeed'),
                 resultCanvas: document.getElementById('resultCanvas'),
-                cameraInstructions: document.querySelector('.camera-instructions-overlay'),
+                cameraInstructions: document.getElementById('cameraInstructions'),
                 loader: document.getElementById('loader'),
                 errorMessageDiv: document.getElementById('errorMessage'),
                 historyButton: document.getElementById('historyButton'),
@@ -284,6 +252,7 @@
                 predictButton: document.getElementById('predictButton'),
                 downloadResultButton: document.getElementById('downloadResultButton'),
                 modelToggle: document.getElementById('modelToggle'),
+                highContrastButton: document.getElementById('highContrastButton'),
                 statusSpan: document.getElementById('status'),
                 numDeteccionesSpan: document.getElementById('numDetecciones'),
                 uniqueLabelsSpan: document.getElementById('uniqueLabels'),
@@ -296,16 +265,15 @@
             };
             const resultContext = dom.resultCanvas.getContext('2d');
 
-            // --- Estado de la aplicación ---
             let state = {
                 mediaStream: null,
                 originalImageBase64: null,
                 predictionImageBase64: null,
                 db: null,
                 isProcessing: false,
+                isHighContrastMode: false,
             };
-            
-            // --- Base de Datos (IndexedDB) para el Historial ---
+
             function initDB() {
                 const request = indexedDB.open("PavimindHistoryDB", 2);
                 request.onerror = (e) => console.error("Error DB:", e);
@@ -363,36 +331,33 @@
                 await loadHistory();
             }
 
-            // --- Control de la Interfaz de Usuario (UI) ---
             function setUIState(mode) {
                 dom.loader.style.display = 'none';
                 dom.downloadResultButton.classList.add('hidden');
                 state.isProcessing = false;
 
+                const isCaptureMode = mode === 'capture';
+                dom.cameraFeed.style.display = isCaptureMode ? 'block' : 'none';
+                dom.resultCanvas.style.display = isCaptureMode ? 'none' : 'block';
+                dom.highContrastButton.style.display = isCaptureMode ? 'flex' : 'none';
+                dom.captureButton.classList.toggle('hidden', !isCaptureMode && mode !== 'result');
+                dom.predictButton.classList.toggle('hidden', mode !== 'predict');
+                dom.galleryUploadButton.style.visibility = (isCaptureMode || mode === 'result') ? 'visible' : 'hidden';
+
                 if (mode === 'capture') {
-                    dom.cameraFeed.style.display = 'block';
-                    dom.resultCanvas.style.display = 'none';
-                    dom.cameraInstructions.classList.remove('hidden');
-                    dom.captureButton.classList.remove('hidden');
-                    dom.predictButton.classList.add('hidden');
-                    dom.galleryUploadButton.style.visibility = 'visible';
-                } else if (mode === 'predict') {
-                    dom.cameraFeed.style.display = 'none';
-                    dom.resultCanvas.style.display = 'block';
-                    dom.cameraInstructions.classList.add('hidden');
-                    dom.captureButton.classList.add('hidden');
-                    dom.predictButton.classList.remove('hidden');
-                    dom.galleryUploadButton.style.visibility = 'hidden';
-                } else if (mode === 'loading') {
+                    dom.cameraInstructions.style.opacity = '1';
+                    setTimeout(() => { dom.cameraInstructions.style.opacity = '0'; }, 5000);
+                } else {
+                    dom.cameraInstructions.style.opacity = '0';
+                }
+
+                if (mode === 'loading') {
                     dom.loader.style.display = 'block';
                     dom.predictButton.classList.add('hidden');
                     state.isProcessing = true;
                 } else if (mode === 'result') {
-                    dom.predictButton.classList.add('hidden');
-                    dom.captureButton.classList.remove('hidden');
                     dom.captureButton.innerHTML = '<span class="material-icons">restart_alt</span> Reiniciar';
                     dom.downloadResultButton.classList.remove('hidden');
-                    dom.galleryUploadButton.style.visibility = 'visible';
                 }
             }
 
@@ -411,20 +376,12 @@
                 dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
-            // --- Lógica de Cámara y Predicción ---
             async function startCamera() {
                 try {
-                    // Si ya hay un stream de video, lo detenemos antes de pedir uno nuevo.
                     if (state.mediaStream) {
                         state.mediaStream.getTracks().forEach(track => track.stop());
                     }
-                    
-                    // Pedimos acceso a la cámara. El navegador recuerda el permiso otorgado.
-                    // No volverá a preguntar si el usuario ya lo aceptó para este sitio.
-                    state.mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: { exact: "environment" }, aspectRatio: 1 }
-                    });
-                    
+                    state.mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" }, aspectRatio: 1 } });
                     dom.cameraFeed.srcObject = state.mediaStream;
                     await dom.cameraFeed.play();
                     setUIState('capture');
@@ -442,6 +399,11 @@
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
+                    
+                    if (state.isHighContrastMode) {
+                        ctx.filter = 'contrast(130%) brightness(70%)';
+                    }
+                    
                     ctx.drawImage(img, 0, 0);
                     state.originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
@@ -460,10 +422,8 @@
             
             async function handlePrediction() {
                 if (!state.originalImageBase64 || state.isProcessing) return;
-
                 setUIState('loading');
                 dom.statusSpan.textContent = "Procesando predicción...";
-
                 try {
                     const base64Data = state.originalImageBase64.split(',')[1];
                     const response = await fetch(currentApiUrl, {
@@ -472,7 +432,6 @@
                         body: JSON.stringify({ image_base64: base64Data })
                     });
                     if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
-                    
                     const data = await response.json();
                     if (!data.success) throw new Error(data.detail || "La predicción falló.");
                     
@@ -482,7 +441,6 @@
                     updateResultFieldsUI(data);
                     await savePrediction(data);
                     setUIState('result');
-
                 } catch (error) {
                     displayError(error.message);
                     dom.statusSpan.textContent = "Error en predicción.";
@@ -495,7 +453,6 @@
                 dom.timestampSpan.textContent = new Date(data.timestamp).toLocaleTimeString();
                 dom.numDeteccionesSpan.textContent = data.num_detecciones;
                 dom.uniqueLabelsSpan.textContent = data.unique_labels.join(', ') || "Ninguna";
-                
                 if (data.detecciones.length > 0) {
                     const avgConf = data.detecciones.reduce((acc, d) => acc + d.confidence, 0) / data.detecciones.length;
                     dom.avgConfidenceSpan.textContent = `${(avgConf * 100).toFixed(1)}%`;
@@ -513,15 +470,12 @@
                         resultContext.drawImage(img, 0, 0);
                         resultContext.lineWidth = Math.max(2, img.width / 200);
                         resultContext.font = `bold ${Math.max(12, img.width / 30)}px Lexend`;
-                        
                         const color = '#0a84ff';
-                        
                         detections.forEach(det => {
                             const [x1, y1, x2, y2] = det.bbox;
                             const label = `${det.class} (${(det.confidence * 100).toFixed(0)}%)`;
                             resultContext.strokeStyle = color;
                             resultContext.strokeRect(x1, y1, x2 - x1, y2 - y1);
-                            
                             const textMetrics = resultContext.measureText(label);
                             const textHeight = parseInt(resultContext.font, 10);
                             resultContext.fillStyle = color;
@@ -535,7 +489,6 @@
                 });
             }
 
-            // --- Event Listeners ---
             dom.captureButton.addEventListener('click', () => {
                 if (dom.captureButton.textContent.includes("Reiniciar")) {
                     startCamera();
@@ -574,18 +527,24 @@
                 currentApiUrl = dom.modelToggle.checked ? API_URL_FLEXIBLE : API_URL_RIGIDO;
                 displayError(`Modelo cambiado a ${dom.modelToggle.checked ? 'Flexible' : 'Rígido'}.`);
             });
+
+            dom.highContrastButton.addEventListener('click', () => {
+                state.isHighContrastMode = !state.isHighContrastMode;
+                dom.highContrastButton.classList.toggle('active', state.isHighContrastMode);
+                displayError(`Modo Sol ${state.isHighContrastMode ? 'activado' : 'desactivado'}.`);
+            });
             
+            const closeHistory = () => {
+                dom.historyPanel.classList.remove('open');
+                dom.appContainer.classList.remove('history-open');
+                dom.panelOverlay.classList.remove('visible');
+            };
             dom.historyButton.addEventListener('click', async () => {
                 await loadHistory();
                 dom.historyPanel.classList.add('open');
                 dom.appContainer.classList.add('history-open');
                 dom.panelOverlay.classList.add('visible');
             });
-            const closeHistory = () => {
-                dom.historyPanel.classList.remove('open');
-                dom.appContainer.classList.remove('history-open');
-                dom.panelOverlay.classList.remove('visible');
-            };
             dom.closeHistoryButton.addEventListener('click', closeHistory);
             dom.panelOverlay.addEventListener('click', closeHistory);
             dom.historyList.addEventListener('click', (e) => {
@@ -596,7 +555,6 @@
                 }
             });
 
-            // --- Inicio de la Aplicación ---
             initDB();
             startCamera();
         });
