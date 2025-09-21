@@ -277,6 +277,7 @@
                 isHighContrastMode: false,
             };
 
+            // --- Funciones de Base de Datos (Sin Cambios) ---
             function initDB() {
                 const request = indexedDB.open("PavimindHistoryDB", 2);
                 request.onerror = (e) => console.error("Error DB:", e);
@@ -288,16 +289,12 @@
                     }
                 };
             }
-
             async function savePrediction(data) {
                 if (!state.db) return;
                 const transaction = state.db.transaction(["predictions"], "readwrite");
                 const store = transaction.objectStore("predictions");
-                const request = store.add({...data, predictionImage: state.predictionImageBase64 });
-                request.onsuccess = () => {};
-                request.onerror = () => {};
+                store.add({...data, predictionImage: state.predictionImageBase64 });
             }
-            
             async function loadHistory() {
                 if (!state.db) return;
                 const transaction = state.db.transaction(["predictions"], "readonly");
@@ -323,7 +320,6 @@
                     });
                 };
             }
-            
             async function deleteHistoryItem(id) {
                 if (!state.db) return;
                 const transaction = state.db.transaction(["predictions"], "readwrite");
@@ -332,11 +328,11 @@
                 await loadHistory();
             }
 
+            // --- Funciones de UI (Sin Cambios) ---
             function setUIState(mode) {
                 dom.loader.style.display = 'none';
                 dom.downloadResultButton.classList.add('hidden');
                 state.isProcessing = false;
-
                 const isCaptureMode = mode === 'capture';
                 dom.cameraFeed.style.display = isCaptureMode ? 'block' : 'none';
                 dom.resultCanvas.style.display = isCaptureMode ? 'none' : 'block';
@@ -344,12 +340,10 @@
                 dom.captureButton.classList.toggle('hidden', !isCaptureMode && mode !== 'result');
                 dom.predictButton.classList.toggle('hidden', mode !== 'predict');
                 dom.galleryUploadButton.style.visibility = (isCaptureMode || mode === 'result') ? 'visible' : 'hidden';
-
                 if (mode === 'capture') {
                     dom.cameraInstructions.style.opacity = '1';
                     setTimeout(() => { dom.cameraInstructions.style.opacity = '0'; }, 5000);
                 }
-
                 if (mode === 'loading') {
                     dom.loader.style.display = 'block';
                     dom.predictButton.classList.add('hidden');
@@ -359,13 +353,11 @@
                     dom.downloadResultButton.classList.remove('hidden');
                 }
             }
-
             function displayError(message) {
                 dom.errorMessageDiv.textContent = message;
                 dom.errorMessageDiv.classList.add('visible');
                 setTimeout(() => dom.errorMessageDiv.classList.remove('visible'), 4000);
             }
-
             function resetResultFields() {
                 dom.statusSpan.textContent = "Listo para capturar";
                 dom.numDeteccionesSpan.textContent = "N/A";
@@ -375,9 +367,9 @@
                 dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
-            // CORREGIDO: Función para aplicar/quitar filtro a la vista previa
+            // --- Lógica Principal ---
             function updateLiveFeedFilter() {
-                dom.cameraFeed.style.filter = state.isHighContrastMode ? 'contrast(170%) brightness(70%)' : 'none';
+                dom.cameraFeed.style.filter = state.isHighContrastMode ? 'contrast(200%) brightness(70%)' : 'none';
             }
 
             async function startCamera() {
@@ -388,7 +380,7 @@
                     state.mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" }, aspectRatio: 1 } });
                     dom.cameraFeed.srcObject = state.mediaStream;
                     await dom.cameraFeed.play();
-                    updateLiveFeedFilter(); // Aplicar filtro al iniciar cámara si está activo
+                    updateLiveFeedFilter();
                     setUIState('capture');
                     resetResultFields();
                 } catch (err) {
@@ -397,6 +389,7 @@
                 }
             }
             
+            // CORREGIDO: Lógica de filtro centralizada y corregida aquí
             function handleImageFromSource(imageBase64) {
                 const img = new Image();
                 img.onload = () => {
@@ -405,17 +398,19 @@
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     
+                    // Aplicar filtro SIEMPRE que el modo esté activo.
+                    // Esto funciona para galería Y para la captura de cámara.
                     if (state.isHighContrastMode) {
-                        // CORREGIDO: Valores ajustados
-                        ctx.filter = 'contrast(170%) brightness(70%)';
+                        ctx.filter = 'contrast(200%) brightness(70%)';
                     }
                     
                     ctx.drawImage(img, 0, 0);
+                    // La imagen guardada ahora SIEMPRE tendrá el filtro correcto aplicado.
                     state.originalImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
                     dom.resultCanvas.width = canvas.width;
                     dom.resultCanvas.height = canvas.height;
-                    resultContext.drawImage(canvas, 0, 0);
+                    resultContext.drawImage(canvas, 0, 0); // Dibuja la imagen (ya filtrada) en el canvas visible.
 
                     if (state.mediaStream) {
                         state.mediaStream.getTracks().forEach(track => track.stop());
@@ -495,6 +490,7 @@
                 });
             }
 
+            // --- Event Listeners ---
             dom.captureButton.addEventListener('click', () => {
                 if (dom.captureButton.textContent.includes("Reiniciar")) {
                     startCamera();
@@ -505,11 +501,9 @@
                 canvas.width = dom.cameraFeed.videoWidth;
                 canvas.height = dom.cameraFeed.videoHeight;
                 const ctx = canvas.getContext('2d');
-                // IMPORTANTE: El filtro de la VISTA PREVIA se aplica aquí al capturar.
-                ctx.filter = dom.cameraFeed.style.filter;
+                // CORREGIDO: Dibuja la imagen del video SIN filtro aquí.
+                // El filtro se aplicará de forma centralizada en handleImageFromSource.
                 ctx.drawImage(dom.cameraFeed, 0, 0, canvas.width, canvas.height);
-                // La función handleImageFromSource YA NO aplicará el filtro,
-                // porque la imagen que le pasamos ya lo tiene.
                 handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9));
             });
             
@@ -541,7 +535,7 @@
             dom.highContrastButton.addEventListener('click', () => {
                 state.isHighContrastMode = !state.isHighContrastMode;
                 dom.highContrastButton.classList.toggle('active', state.isHighContrastMode);
-                updateLiveFeedFilter(); // CORREGIDO: Actualiza la vista previa al hacer clic
+                updateLiveFeedFilter();
                 displayError(`Modo Sol ${state.isHighContrastMode ? 'activado' : 'desactivado'}.`);
             });
             
@@ -553,7 +547,7 @@
             dom.historyButton.addEventListener('click', async () => {
                 await loadHistory();
                 dom.historyPanel.classList.add('open');
-                dom.appContainer.classList.add('history-open');
+                dom.appContainer.classList.add('open');
                 dom.panelOverlay.classList.add('visible');
             });
             dom.closeHistoryButton.addEventListener('click', closeHistory);
@@ -566,6 +560,7 @@
                 }
             });
 
+            // --- Inicio de la Aplicación ---
             initDB();
             startCamera();
         });
