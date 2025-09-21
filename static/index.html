@@ -93,6 +93,8 @@
         }
         .camera-preview-container video, .camera-preview-container canvas { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
         
+        .camera-preview-container video { transition: filter 0.3s ease; } /* Transición suave para el filtro */
+
         .camera-instructions-overlay {
             position: absolute;
             bottom: 10px;
@@ -109,6 +111,7 @@
             color: rgba(255, 255, 255, 0.9);
             opacity: 0; /* Inicia oculto */
             transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
         }
 
         .camera-utility-button {
@@ -192,7 +195,7 @@
             <div class="glass-card camera-preview-container">
                 <video id="cameraFeed" autoplay playsinline></video>
                 <canvas id="resultCanvas"></canvas>
-                <button id="highContrastButton" class="camera-utility-button" title="Activar modo alto contraste">
+                <button id="highContrastButton" class="camera-utility-button" title="Activar modo sol (alto contraste)">
                     <span class="material-icons">tonality</span>
                 </button>
                 <div id="cameraInstructions" class="camera-instructions-overlay">
@@ -288,13 +291,11 @@
 
             async function savePrediction(data) {
                 if (!state.db) return;
-                return new Promise((resolve, reject) => {
-                    const transaction = state.db.transaction(["predictions"], "readwrite");
-                    const store = transaction.objectStore("predictions");
-                    const request = store.add({...data, predictionImage: state.predictionImageBase64 });
-                    request.onsuccess = resolve;
-                    request.onerror = reject;
-                });
+                const transaction = state.db.transaction(["predictions"], "readwrite");
+                const store = transaction.objectStore("predictions");
+                const request = store.add({...data, predictionImage: state.predictionImageBase64 });
+                request.onsuccess = () => {};
+                request.onerror = () => {};
             }
             
             async function loadHistory() {
@@ -347,8 +348,6 @@
                 if (mode === 'capture') {
                     dom.cameraInstructions.style.opacity = '1';
                     setTimeout(() => { dom.cameraInstructions.style.opacity = '0'; }, 5000);
-                } else {
-                    dom.cameraInstructions.style.opacity = '0';
                 }
 
                 if (mode === 'loading') {
@@ -376,6 +375,11 @@
                 dom.captureButton.innerHTML = '<span class="material-icons">camera_alt</span> Capturar';
             }
 
+            // CORREGIDO: Función para aplicar/quitar filtro a la vista previa
+            function updateLiveFeedFilter() {
+                dom.cameraFeed.style.filter = state.isHighContrastMode ? 'contrast(170%) brightness(70%)' : 'none';
+            }
+
             async function startCamera() {
                 try {
                     if (state.mediaStream) {
@@ -384,6 +388,7 @@
                     state.mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" }, aspectRatio: 1 } });
                     dom.cameraFeed.srcObject = state.mediaStream;
                     await dom.cameraFeed.play();
+                    updateLiveFeedFilter(); // Aplicar filtro al iniciar cámara si está activo
                     setUIState('capture');
                     resetResultFields();
                 } catch (err) {
@@ -401,7 +406,8 @@
                     const ctx = canvas.getContext('2d');
                     
                     if (state.isHighContrastMode) {
-                        ctx.filter = 'contrast(130%) brightness(70%)';
+                        // CORREGIDO: Valores ajustados
+                        ctx.filter = 'contrast(170%) brightness(70%)';
                     }
                     
                     ctx.drawImage(img, 0, 0);
@@ -499,7 +505,11 @@
                 canvas.width = dom.cameraFeed.videoWidth;
                 canvas.height = dom.cameraFeed.videoHeight;
                 const ctx = canvas.getContext('2d');
+                // IMPORTANTE: El filtro de la VISTA PREVIA se aplica aquí al capturar.
+                ctx.filter = dom.cameraFeed.style.filter;
                 ctx.drawImage(dom.cameraFeed, 0, 0, canvas.width, canvas.height);
+                // La función handleImageFromSource YA NO aplicará el filtro,
+                // porque la imagen que le pasamos ya lo tiene.
                 handleImageFromSource(canvas.toDataURL('image/jpeg', 0.9));
             });
             
@@ -531,6 +541,7 @@
             dom.highContrastButton.addEventListener('click', () => {
                 state.isHighContrastMode = !state.isHighContrastMode;
                 dom.highContrastButton.classList.toggle('active', state.isHighContrastMode);
+                updateLiveFeedFilter(); // CORREGIDO: Actualiza la vista previa al hacer clic
                 displayError(`Modo Sol ${state.isHighContrastMode ? 'activado' : 'desactivado'}.`);
             });
             
